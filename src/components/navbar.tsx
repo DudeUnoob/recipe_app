@@ -66,8 +66,8 @@ export default function Navbar() {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <ChefHat className={`h-8 w-8 ${isScrolled ? 'text-gray-900' : 'text-gray-900'}`} />
-              <span className={`ml-2 text-xl font-bold ${isScrolled ? 'text-gray-900' : 'text-gray-900'}`}>RecipeNotes</span>
+              <ChefHat className={`h-8 w-8 ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
+              <span className={`ml-2 text-xl font-bold ${isScrolled ? 'text-gray-900' : 'text-white'}`}>RecipeNotes</span>
             </Link>
           </div>
           <div className="hidden lg:flex lg:items-center">
@@ -75,7 +75,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center">
             <div className="hidden lg:flex space-x-4">
-              <Button variant="ghost" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-gray-700 hover:text-gray-900'}`}>
+              <Button variant="ghost" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'}`}>
                 Log in
               </Button>
               <Button className="bg-gray-900 text-white hover:bg-gray-800">Sign up</Button>
@@ -83,7 +83,7 @@ export default function Navbar() {
             <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-gray-700 hover:text-gray-900'}`}>
+                  <Button variant="ghost" size="icon" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'}`}>
                     <Menu className="h-6 w-6" />
                     <span className="sr-only">Open main menu</span>
                   </Button>
