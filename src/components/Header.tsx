@@ -6,6 +6,6 @@ const Header: React.FC = () => {
       <h1 className="text-4xl font-bold">RecipeNotes</h1>
     </header>
   );
-}
+};
 
 export default Header;
