@@ -5,12 +5,13 @@ import  TestimonialCard from '../components/TestimonialCard';
 import StepCard  from '../components/StepCard';
 import  Arrow  from '../components/Arrow';
 import { BookOpen, Utensils, Users, Search, Star, ChefHat, Leaf } from 'lucide-react';
-
+import { useAuth } from "../contexts/AuthContext"
+//  const { user, loading, signOut } = useAuth()
 // import { Button } from "@/components/ui/button"
 // import { Card, CardContent } from "@/components/ui/card"
 // import { BookOpen, Utensils, Users, Search, Star, Clock, ChefHat, Leaf } from "lucide-react"
-
 export default function LandingPage() {
+  const { user, loading, signOut } = useAuth()
   return (
     <div className="min-h-screen bg-white text-gray-800 font-sans">
       <main className="pt-20"> {/* Added top padding to account for fixed navbar */}

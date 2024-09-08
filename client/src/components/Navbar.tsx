@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ChefHat, Menu, X } from "lucide-react"
-
 import { Button } from "./ui/button"
 import {
   DropdownMenu,
@@ -12,17 +11,42 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
+import { supabase } from "../lib/supabase"
+import { useAuth } from "../contexts/AuthContext"
 
 export default function Navbar() {
+  const { user, loading, signOut } = useAuth()
+
   const [isScrolled, setIsScrolled] = React.useState(false)
+  const [session, setSession] = React.useState(null)
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
     window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      subscription.unsubscribe()
+    }
   }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    navigate('/')
+  }
 
   const NavItems = React.forwardRef<
     HTMLDivElement,
@@ -75,10 +99,11 @@ export default function Navbar() {
           </div>
           <div className="flex items-center">
             <div className="hidden lg:flex space-x-4">
-              <Button variant="ghost" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-gray-700 hover:text-gray-900'}`}>
+              <Button variant="ghost" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-gray-700 hover:text-gray-900'}`} 
+              onClick={() => window.location.href = '/login'}>
                 Log in
               </Button>
-              <Button className="bg-gray-900 text-white hover:bg-gray-800">Sign up</Button>
+              <Button className="bg-gray-900 text-white hover:bg-gray-800" onClick={() => window.location.href = '/signup'}>Sign up</Button>
             </div>
             <div className="lg:hidden">
               <Sheet>
@@ -103,8 +128,8 @@ export default function Navbar() {
                   </div>
                   <div className="flex flex-col space-y-4">
                     <NavItems />
-                    <Button variant="ghost" className="justify-start">Log in</Button>
-                    <Button className="justify-start bg-gray-900 text-white hover:bg-gray-800">Sign up</Button>
+                    <Button variant="ghost" className="justify-start" onClick={() => window.location.href = '/login'}>Log in</Button>
+                    <Button className="justify-start bg-gray-900 text-white hover:bg-gray-800" onClick={() => window.location.href = '/signup'}>Sign up</Button>
                   </div>
                 </SheetContent>
               </Sheet>
