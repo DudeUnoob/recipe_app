@@ -11,7 +11,7 @@ import { useAuth } from "../contexts/AuthContext"
 // import { Card, CardContent } from "@/components/ui/card"
 // import { BookOpen, Utensils, Users, Search, Star, Clock, ChefHat, Leaf } from "lucide-react"
 export default function LandingPage() {
-  const { user, loading, signOut } = useAuth()
+  // const { user, loading, signOut } = useAuth()
   return (
     <div className="min-h-screen bg-white text-gray-800 font-sans">
       <main className="pt-20"> {/* Added top padding to account for fixed navbar */}

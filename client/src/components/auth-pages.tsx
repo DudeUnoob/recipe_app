@@ -8,39 +8,33 @@ import { Label } from "../components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { ChefHat, Mail, Lock, User } from "lucide-react"
 import { Link } from "react-router-dom"
-import { supabase } from "../lib/supabase" // Make sure to import your Supabase client
+import { useAuth } from "../contexts/AuthContext"
+import { supabase } from "../lib/supabase"
 
 export function AuthPages() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const navigate = useNavigate()
+  const { signIn, signUp } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      console.error('Error logging in:', error.message)
-    } else {
+    try {
+      await signIn(email, password)
       navigate('/dashboard')
+    } catch (error) {
+      console.error('Error logging in:', error)
     }
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    const { error } = await supabase.auth.signUp({ 
-      email, 
-      password,
-      options: {
-        data: {
-          full_name: name,
-        }
-      }
-    })
-    if (error) {
-      console.error('Error signing up:', error.message)
-    } else {
+    try {
+      await signUp(email, password)
       navigate('/dashboard')
+    } catch (error) {
+      console.error('Error signing up:', error)
     }
   }
 
