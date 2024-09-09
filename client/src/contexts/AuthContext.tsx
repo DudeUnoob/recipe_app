@@ -23,6 +23,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
   useEffect(() => {
     const fetchSession = async () => {
       const { data, error } = await supabase.auth.getSession()
+      if(error) {}
       if (data.session) {
         setSession(data.session)
         setUser(data.session.user)
@@ -35,6 +36,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event) {}
         setSession(session)
         setUser(session?.user ?? null)
         setIsAuthenticated(!!session)

@@ -5,7 +5,7 @@ import  TestimonialCard from '../components/TestimonialCard';
 import StepCard  from '../components/StepCard';
 import  Arrow  from '../components/Arrow';
 import { BookOpen, Utensils, Users, Search, Star, ChefHat, Leaf } from 'lucide-react';
-import { useAuth } from "../contexts/AuthContext"
+//import { useAuth } from "../contexts/AuthContext"
 //  const { user, loading, signOut } = useAuth()
 // import { Button } from "@/components/ui/button"
 // import { Card, CardContent } from "@/components/ui/card"
