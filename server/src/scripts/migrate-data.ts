@@ -7,7 +7,7 @@ import { config } from 'dotenv';
 config();
 
 const pool = new Pool({
-  connectionString: "postgresql://postgres.ncoqwrqknmuqeaiqtmfn:recipenotes123@@aws-0-us-east-1.pooler.supabase.com:6543/postgres",
+  connectionString: "",
 });
 
 async function migrateData() {

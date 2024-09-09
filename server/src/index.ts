@@ -1,13 +1,18 @@
 // src/server/index.ts
 import express from 'express';
-import { Pool } from 'pg';
+import { Pool } from "pg";
 import { config } from 'dotenv';
+import recipeRoutes from "../src/routes/recipeRoutes"
+import bodyParser from 'body-parser';
 
 config(); // Load environment variables
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(bodyParser.json())
+
+app.use('/api', recipeRoutes)
 // Database connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
