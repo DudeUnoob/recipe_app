@@ -15,7 +15,7 @@ const AboutPage: React.FC = () => {
         <TeamSection />
         <JoinSection />
       </main>
-      <Footer />
+      <Footer page="About"/>
 
     </div>
   );

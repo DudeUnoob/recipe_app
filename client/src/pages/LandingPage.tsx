@@ -134,7 +134,7 @@ export default function LandingPage() {
           <p>&copy; 2023 RecipeNotes. All rights reserved.</p>
         </div>
       </footer> */}
-      <Footer />
+      <Footer page={"Landing"} />
     </div>
   )
 }
