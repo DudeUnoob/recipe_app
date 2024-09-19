@@ -111,7 +111,7 @@ export default function Navbar() {
             <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'}`}>
+                  <Button variant="ghost" size="icon" className={`${isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-gray-700 hover:text-gray-900'}`}>
                     <Menu className="h-6 w-6" />
                     <span className="sr-only">Open main menu</span>
                   </Button>
@@ -137,7 +137,8 @@ export default function Navbar() {
                         className="justify-start"
                         onClick={() => user ? handleSignOut() : navigate('/login')}
                       >
-                        {user ? "Log out" : "Log in"}
+                       
+                        {user ? "Log out": "Log in"}
                       </Button>
                     )}
                     {!user && !loading && (

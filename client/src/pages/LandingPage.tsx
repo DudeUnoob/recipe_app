@@ -5,6 +5,7 @@ import  TestimonialCard from '../components/TestimonialCard';
 import StepCard  from '../components/StepCard';
 import  Arrow  from '../components/Arrow';
 import { BookOpen, Utensils, Users, Search, Star, ChefHat, Leaf } from 'lucide-react';
+import Footer from '../components/Footer';
 //import { useAuth } from "../contexts/AuthContext"
 //  const { user, loading, signOut } = useAuth()
 // import { Button } from "@/components/ui/button"
@@ -128,11 +129,12 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="w-full px-4 py-8 text-center text-gray-500 bg-gray-50">
+      {/* <footer className="w-full px-4 py-8 text-center text-gray-500 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <p>&copy; 2023 RecipeNotes. All rights reserved.</p>
         </div>
-      </footer>
+      </footer> */}
+      <Footer />
     </div>
   )
 }

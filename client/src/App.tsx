@@ -6,6 +6,7 @@ import { AuthPages } from './components/auth-pages';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AboutPage from './pages/AboutPage';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path='/login' element={<AuthPages />}/>
             <Route path='/signup' element={<AuthPages />}/>
+            <Route path='/about' element={<AboutPage />}/>
             <Route element={<ProtectedRoute />}>
               <Route path='/dashboard' element={<Dashboard />}/>
               {/* Add other protected routes here */}
