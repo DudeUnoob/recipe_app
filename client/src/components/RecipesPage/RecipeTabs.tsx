@@ -1,7 +1,8 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { Recipe } from '../../lib/types';
-import { RecipeCard } from './RecipeCard';
+import RecipeCard from './RecipeCard';
+//import { RecipeCard } from './RecipeCard';
 
 interface RecipeTabsProps {
   filteredRecipes: Recipe[];

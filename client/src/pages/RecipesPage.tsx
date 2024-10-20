@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { Button } from "../components/ui/button"
+//import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Search, Plus } from "lucide-react"
+import { Search } from "lucide-react"
 import RecipeCard from "../components/RecipesPage/RecipeCard"
 import AddRecipeDialog from "../components/RecipesPage/AddRecipeDialog"
 import ViewRecipeDialog from "../components/RecipesPage/ViewRecipeDialog"
@@ -17,7 +17,7 @@ const initialRecipes = [
 ]
 
 initialRecipes.forEach(async(item) => {
-  const newImage = await imageApi(item.title);
+  const newImage: any = await imageApi(item.title);
   item.image = newImage.results[0].urls.raw
 })
 
