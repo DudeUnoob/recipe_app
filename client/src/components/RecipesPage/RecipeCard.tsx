@@ -1,23 +1,28 @@
 import React from "react"
-import { Button } from "../ui/button"
-import { Card, CardContent } from "../ui/card"
-import { ChefHat, Clock, Users, Share2, Heart, BookOpen } from "lucide-react"
-import imageApi from "../../functions/imageApi"
+import { Card, CardContent } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { ChefHat, Clock, Users, BookOpen, Heart, Share2 } from "lucide-react"
 
 interface Recipe {
-  id: number
-  title: string
-  category: string
-  cookTime: string
-  servings: number
-  image: string
+  id: number;
+  title: string;
+  category: string;
+  cookTime: string;
+  servings: number;
+  image: string;
+  ingredients: string;
+  instructions: string;
+  isFavorite: boolean;
+  dateAdded: Date;
 }
 
 interface RecipeCardProps {
-  recipe: Recipe
+  recipe: Recipe;
+  onView: () => void;
+  onToggleFavorite: () => void;
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite }) => {
   return (
     <Card className="overflow-hidden">
       <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
@@ -38,13 +43,13 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={onView}>
             <BookOpen className="mr-2 h-4 w-4" />
             View
           </Button>
           <div className="flex space-x-2">
-            <Button variant="ghost" size="sm">
-              <Heart className="h-4 w-4" />
+            <Button variant="ghost" size="sm" onClick={onToggleFavorite}>
+              <Heart className={`h-4 w-4 ${recipe.isFavorite ? 'fill-current text-red-500' : ''}`} />
             </Button>
             <Button variant="ghost" size="sm">
               <Share2 className="h-4 w-4" />
@@ -55,3 +60,5 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     </Card>
   )
 }
+
+export default RecipeCard

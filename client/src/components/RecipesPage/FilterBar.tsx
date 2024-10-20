@@ -1,15 +1,14 @@
 import React from "react"
-import { Button } from "../ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { Plus } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { AddRecipeDialog } from "./AddRecipeDialog"
 
 interface FilterBarProps {
   selectedCategory: string
   setSelectedCategory: (category: string) => void
+  onAddRecipe: (newRecipe: any) => void
 }
 
-export function FilterBar({ selectedCategory, setSelectedCategory }: FilterBarProps) {
+export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }: FilterBarProps) {
   return (
     <div className="flex space-x-4 w-full md:w-auto">
       <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -25,7 +24,7 @@ export function FilterBar({ selectedCategory, setSelectedCategory }: FilterBarPr
         </SelectContent>
       </Select>
       
-      <AddRecipeDialog />
+      <AddRecipeDialog onAddRecipe={onAddRecipe} />
     </div>
   )
 }
