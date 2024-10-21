@@ -106,7 +106,7 @@ const RecipesPage: React.FC = () => {
               </SelectContent>
             </Select>
             
-            <AddRecipeDialog newRecipe={newRecipe} setNewRecipe={setNewRecipe} handleAddRecipe={handleAddRecipe} />
+            <AddRecipeDialog newRecipe={newRecipe} setNewRecipe={setNewRecipe} handleAddRecipe={handleAddRecipe} onAddRecipe={null} />
           </div>
         </div>
         
