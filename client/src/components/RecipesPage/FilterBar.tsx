@@ -1,14 +1,32 @@
-//import React from "react"
+import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import AddRecipeDialog from "./AddRecipeDialog"
-//import { AddRecipeDialog } from "./AddRecipeDialog"
+
+interface Recipe {
+  title: string;
+  category: string;
+  cookTime: string;
+  servings: number;
+  ingredients: string;
+  instructions: string;
+}
+
 interface FilterBarProps {
   selectedCategory: string
   setSelectedCategory: (category: string) => void
-  onAddRecipe: (newRecipe: any) => void
+  onAddRecipe: (newRecipe: Recipe) => void
 }
 
 export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }: FilterBarProps) {
+  const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({});
+
+  const handleAddRecipe = () => {
+    if (newRecipe.title && newRecipe.category && newRecipe.cookTime && newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
+      onAddRecipe(newRecipe as Recipe);
+      setNewRecipe({});
+    }
+  };
+
   return (
     <div className="flex space-x-4 w-full md:w-auto">
       <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -24,7 +42,12 @@ export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }
         </SelectContent>
       </Select>
       
-      <AddRecipeDialog onAddRecipe={onAddRecipe} />
+      <AddRecipeDialog 
+        newRecipe={newRecipe} 
+        setNewRecipe={setNewRecipe} 
+        handleAddRecipe={handleAddRecipe}
+        onAddRecipe={onAddRecipe}
+      />
     </div>
   )
 }

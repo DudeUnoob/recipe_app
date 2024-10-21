@@ -20,6 +20,7 @@ interface AddRecipeDialogProps {
   newRecipe: Partial<Recipe>;
   setNewRecipe: React.Dispatch<React.SetStateAction<Partial<Recipe>>>;
   handleAddRecipe: () => void;
+  onAddRecipe: any;
 }
 
 const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewRecipe, handleAddRecipe }) => {
