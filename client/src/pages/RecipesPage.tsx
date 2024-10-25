@@ -22,6 +22,8 @@ initialRecipes.forEach(async(item) => {
 })
 
 
+
+
 interface Recipe {
   id: number;
   title: string;
@@ -51,14 +53,29 @@ const RecipesPage: React.FC = () => {
   const favoriteRecipes = recipes.filter(recipe => recipe.isFavorite)
   const recentlyAddedRecipes = [...recipes].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime()).slice(0, 5)
 
-  const handleAddRecipe = () => {
+
+
+  const handleAddRecipe = async() => {
+
+    const callNewRecipeImage = async (title: any) => {
+      try {
+        const newImage: any = await imageApi(title);  // Assuming imageApi fetches images.
+        return newImage.results[0].urls.raw;          // Make sure this API structure is correct.
+      } catch (error) {
+        console.error("Error fetching image:", error);
+        return ""; // Handle the error by returning an empty string or default image.
+      }
+    }
+  
+    const imageUrl = await callNewRecipeImage(newRecipe.title);  // Await the result here.
+  
     const recipeToAdd: Recipe = {
       ...newRecipe as Recipe,
       id: recipes.length + 1,
-      image: "/placeholder.svg?height=200&width=300",
+      image: imageUrl,
       isFavorite: false,
-      dateAdded: new Date()
-    }
+      dateAdded: new Date(),
+    };
     setRecipes([...recipes, recipeToAdd])
     setNewRecipe({ title: "", category: "", cookTime: "", servings: 0, ingredients: "", instructions: "" })
   }

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import AddRecipeDialog from "./AddRecipeDialog"
+// import imageApi from "../../functions/imageApi";
 
 interface Recipe {
   title: string;
@@ -9,6 +10,7 @@ interface Recipe {
   servings: number;
   ingredients: string;
   instructions: string;
+  image: string;
 }
 
 interface FilterBarProps {
@@ -19,6 +21,11 @@ interface FilterBarProps {
 
 export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }: FilterBarProps) {
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({});
+
+  // const callNewRecipeImage = async() => {
+  //   const newImage: any = await imageApi(newRecipe.title);
+  //   newImage.image = newImage.results[0].urls.raw
+  // }
 
   const handleAddRecipe = () => {
     if (newRecipe.title && newRecipe.category && newRecipe.cookTime && newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
