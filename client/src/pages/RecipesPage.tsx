@@ -8,9 +8,12 @@ import RecipeCard from "../components/RecipesPage/RecipeCard"
 import AddRecipeDialog from "../components/RecipesPage/AddRecipeDialog"
 import ViewRecipeDialog from "../components/RecipesPage/ViewRecipeDialog"
 import imageApi from "../functions/imageApi"
+import { supabase } from "../lib/supabase"
+import { useAuth } from "../contexts/AuthContext"
+
 
 // Initial mock data for recipes
-const initialRecipes = [
+let initialRecipes = [
   { id: 1, title: "Spaghetti Carbonara", category: "Dinner", cookTime: "30 mins", servings: 4, image: "/placeholder.svg?height=200&width=300", ingredients: "400g spaghetti, 200g pancetta, 4 eggs, 100g Parmesan cheese, Black pepper", instructions: "1. Cook pasta. 2. Fry pancetta. 3. Mix eggs and cheese. 4. Combine all ingredients.", isFavorite: false, dateAdded: new Date("2023-05-01") },
   { id: 2, title: "Avocado Toast", category: "Breakfast", cookTime: "10 mins", servings: 2, image: "/placeholder.svg?height=200&width=300", ingredients: "2 slices bread, 1 ripe avocado, Salt, Pepper, Red pepper flakes", instructions: "1. Toast bread. 2. Mash avocado. 3. Spread on toast. 4. Season and serve.", isFavorite: false, dateAdded: new Date("2023-05-15") },
   { id: 3, title: "Chicken Stir Fry", category: "Dinner", cookTime: "25 mins", servings: 3, image: "/placeholder.svg?height=200&width=300", ingredients: "500g chicken breast, Mixed vegetables, Soy sauce, Ginger, Garlic", instructions: "1. Cut chicken. 2. Stir-fry vegetables. 3. Add chicken. 4. Season with sauce.", isFavorite: false, dateAdded: new Date("2023-06-01") },
@@ -44,11 +47,19 @@ const RecipesPage: React.FC = () => {
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({ title: "", category: "", cookTime: "", servings: 0, ingredients: "", instructions: "" })
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [activeTab, setActiveTab] = useState("all")
+  //const { user } = useAuth()
 
-  const filteredRecipes = recipes.filter(recipe => 
+
+
+
+  let filteredRecipes = recipes.filter(recipe => 
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (selectedCategory === "All" || recipe.category === selectedCategory)
   )
+
+  // filteredRecipes = await supabase.from("recipes").select("*")
+  // .eq("user_id", user?.id)
+
 
   const favoriteRecipes = recipes.filter(recipe => recipe.isFavorite)
   const recentlyAddedRecipes = [...recipes].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime()).slice(0, 5)
@@ -66,7 +77,7 @@ const RecipesPage: React.FC = () => {
         return ""; // Handle the error by returning an empty string or default image.
       }
     }
-  
+    
     const imageUrl = await callNewRecipeImage(newRecipe.title);  // Await the result here.
   
     const recipeToAdd: Recipe = {
@@ -76,8 +87,22 @@ const RecipesPage: React.FC = () => {
       isFavorite: false,
       dateAdded: new Date(),
     };
+
+      await supabase.from("recipes").insert([
+      { title: newRecipe.title, id: recipes.length + 1,  category: newRecipe.category, cook_time: newRecipe.cookTime,
+        servings: newRecipe.servings, ingredients: newRecipe.ingredients, instructions: newRecipe.instructions,
+        image: imageUrl,
+        isFavorite: false,
+        date_added: new Date()
+      }
+    ]).select()
+
+
+
     setRecipes([...recipes, recipeToAdd])
     setNewRecipe({ title: "", category: "", cookTime: "", servings: 0, ingredients: "", instructions: "" })
+
+    
   }
 
   const toggleFavorite = (id: number) => {
