@@ -10,7 +10,7 @@ import { Plus } from "lucide-react"
 interface Recipe {
   title: string;
   category: string;
-  cookTime: string;
+  cooktime: string;
   servings: number;
   ingredients: string;
   instructions: string;
@@ -68,13 +68,13 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
             </Select>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="cookTime" className="text-right">
+            <Label htmlFor="cooktime" className="text-right">
               Cook Time
             </Label>
             <Input
-              id="cookTime"
-              value={newRecipe.cookTime}
-              onChange={(e) => setNewRecipe({...newRecipe, cookTime: e.target.value})}
+              id="cooktime"
+              value={newRecipe.cooktime}
+              onChange={(e) => setNewRecipe({...newRecipe, cooktime: e.target.value})}
               className="col-span-3"
               placeholder="e.g., 30 mins"
               required

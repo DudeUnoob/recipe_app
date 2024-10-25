@@ -3,7 +3,7 @@ export interface Recipe {
     id: number;
     title: string;
     category: string;
-    cookTime: string;
+    cooktime: string;
     servings: number;
     image: string;
   }

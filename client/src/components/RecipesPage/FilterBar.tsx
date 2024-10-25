@@ -6,7 +6,7 @@ import AddRecipeDialog from "./AddRecipeDialog"
 interface Recipe {
   title: string;
   category: string;
-  cookTime: string;
+  cooktime: string;
   servings: number;
   ingredients: string;
   instructions: string;
@@ -28,7 +28,7 @@ export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }
   // }
 
   const handleAddRecipe = () => {
-    if (newRecipe.title && newRecipe.category && newRecipe.cookTime && newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
+    if (newRecipe.title && newRecipe.category && newRecipe.cooktime && newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
       onAddRecipe(newRecipe as Recipe);
       setNewRecipe({});
     }

@@ -7,13 +7,13 @@ interface Recipe {
   id: number;
   title: string;
   category: string;
-  cookTime: string;
+  cooktime: string;
   servings: number;
   image: string;
   ingredients: string;
   instructions: string;
   isFavorite: boolean;
-  dateAdded: Date;
+  dateadded: Date;
 }
 
 interface ViewRecipeDialogProps {
@@ -37,7 +37,7 @@ const ViewRecipeDialog: React.FC<ViewRecipeDialogProps> = ({ recipe, onClose }) 
             </span>
             <span className="flex items-center">
               <Clock className="mr-1 h-4 w-4" />
-              {recipe.cookTime}
+              {recipe.cooktime}
             </span>
             <span className="flex items-center">
               <Users className="mr-1 h-4 w-4" />

@@ -6,13 +6,13 @@ export interface Recipe {
   id: number;
   title: string;
   category: string;
-  cookTime: string;
+  cooktime: string;
   servings: number;
   image: string;
   ingredients: string;
   instructions: string;
   isFavorite: boolean;
-  dateAdded: Date;
+  dateadded: Date;
 }
 
 interface RecipeTabsProps {

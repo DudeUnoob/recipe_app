@@ -14,9 +14,9 @@ import { useAuth } from "../contexts/AuthContext"
 
 // Initial mock data for recipes
 let initialRecipes = [
-  { id: 1, title: "Spaghetti Carbonara", category: "Dinner", cookTime: "30 mins", servings: 4, image: "/placeholder.svg?height=200&width=300", ingredients: "400g spaghetti, 200g pancetta, 4 eggs, 100g Parmesan cheese, Black pepper", instructions: "1. Cook pasta. 2. Fry pancetta. 3. Mix eggs and cheese. 4. Combine all ingredients.", isFavorite: false, dateAdded: new Date("2023-05-01") },
-  { id: 2, title: "Avocado Toast", category: "Breakfast", cookTime: "10 mins", servings: 2, image: "/placeholder.svg?height=200&width=300", ingredients: "2 slices bread, 1 ripe avocado, Salt, Pepper, Red pepper flakes", instructions: "1. Toast bread. 2. Mash avocado. 3. Spread on toast. 4. Season and serve.", isFavorite: false, dateAdded: new Date("2023-05-15") },
-  { id: 3, title: "Chicken Stir Fry", category: "Dinner", cookTime: "25 mins", servings: 3, image: "/placeholder.svg?height=200&width=300", ingredients: "500g chicken breast, Mixed vegetables, Soy sauce, Ginger, Garlic", instructions: "1. Cut chicken. 2. Stir-fry vegetables. 3. Add chicken. 4. Season with sauce.", isFavorite: false, dateAdded: new Date("2023-06-01") },
+  { id: 1, title: "Spaghetti Carbonara", category: "Dinner", cooktime: "30 mins", servings: 4, image: "/placeholder.svg?height=200&width=300", ingredients: "400g spaghetti, 200g pancetta, 4 eggs, 100g Parmesan cheese, Black pepper", instructions: "1. Cook pasta. 2. Fry pancetta. 3. Mix eggs and cheese. 4. Combine all ingredients.", isFavorite: false, dateadded: new Date() },
+  { id: 2, title: "Avocado Toast", category: "Breakfast", cooktime: "10 mins", servings: 2, image: "/placeholder.svg?height=200&width=300", ingredients: "2 slices bread, 1 ripe avocado, Salt, Pepper, Red pepper flakes", instructions: "1. Toast bread. 2. Mash avocado. 3. Spread on toast. 4. Season and serve.", isFavorite: false, dateadded: new Date() },
+  { id: 3, title: "Chicken Stir Fry", category: "Dinner", cooktime: "25 mins", servings: 3, image: "/placeholder.svg?height=200&width=300", ingredients: "500g chicken breast, Mixed vegetables, Soy sauce, Ginger, Garlic", instructions: "1. Cut chicken. 2. Stir-fry vegetables. 3. Add chicken. 4. Season with sauce.", isFavorite: false, dateadded: new Date() },
 ]
 
 initialRecipes.forEach(async(item) => {
@@ -31,23 +31,23 @@ interface Recipe {
   id: number;
   title: string;
   category: string;
-  cookTime: string;
+  cooktime: string;
   servings: number;
   image: string;
   ingredients: string;
   instructions: string;
   isFavorite: boolean;
-  dateAdded: Date;
+  dateadded: Date;
 }
 
 const RecipesPage: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
-  const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({ title: "", category: "", cookTime: "", servings: 0, ingredients: "", instructions: "" })
+  const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [activeTab, setActiveTab] = useState("all")
-  //const { user } = useAuth()
+  const { user } = useAuth()
 
 
 
@@ -57,12 +57,21 @@ const RecipesPage: React.FC = () => {
     (selectedCategory === "All" || recipe.category === selectedCategory)
   )
 
-  // filteredRecipes = await supabase.from("recipes").select("*")
-  // .eq("user_id", user?.id)
+
+  getUserRecipes()
+  async function getUserRecipes() {
+    let fetchData = await supabase.from("recipes").select("*")
+    .eq("user_id", user?.id)
+
+    console.log(fetchData.data, filteredRecipes)
+
+  }
+
+  
 
 
   const favoriteRecipes = recipes.filter(recipe => recipe.isFavorite)
-  const recentlyAddedRecipes = [...recipes].sort((a, b) => b.dateAdded.getTime() - a.dateAdded.getTime()).slice(0, 5)
+  const recentlyAddedRecipes = [...recipes].sort((a, b) => b.dateadded.getTime() - a.dateadded.getTime()).slice(0, 5)
 
 
 
@@ -85,22 +94,22 @@ const RecipesPage: React.FC = () => {
       id: recipes.length + 1,
       image: imageUrl,
       isFavorite: false,
-      dateAdded: new Date(),
+      dateadded: new Date(),
     };
 
       await supabase.from("recipes").insert([
-      { title: newRecipe.title, id: recipes.length + 1,  category: newRecipe.category, cook_time: newRecipe.cookTime,
+      { title: newRecipe.title, id: recipes.length + 1,  category: newRecipe.category, cooktime: newRecipe.cooktime,
         servings: newRecipe.servings, ingredients: newRecipe.ingredients, instructions: newRecipe.instructions,
         image: imageUrl,
         isFavorite: false,
-        date_added: new Date()
+        dateadded: new Date()
       }
     ]).select()
 
 
 
     setRecipes([...recipes, recipeToAdd])
-    setNewRecipe({ title: "", category: "", cookTime: "", servings: 0, ingredients: "", instructions: "" })
+    setNewRecipe({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
 
     
   }
