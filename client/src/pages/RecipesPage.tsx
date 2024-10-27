@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
@@ -151,7 +151,7 @@ export default function RecipesPage() {
       const recipeToUpdate = recipes.find(recipe => recipe.id === id)
       if (!recipeToUpdate) return
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("recipes")
         .update({ isFavorite: !recipeToUpdate.isFavorite })
         .eq("id", id)
