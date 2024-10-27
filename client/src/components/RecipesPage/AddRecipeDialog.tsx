@@ -1,36 +1,36 @@
 import React from "react"
 import { Button } from "../../components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import { Plus } from "lucide-react"
-
-interface Recipe {
-  title: string;
-  category: string;
-  cooktime: string;
-  servings: number;
-  ingredients: string;
-  instructions: string;
-}
 
 interface AddRecipeDialogProps {
-  newRecipe: Partial<Recipe>;
-  setNewRecipe: React.Dispatch<React.SetStateAction<Partial<Recipe>>>;
+  isOpen: boolean;
+  onClose: () => void;
+  newRecipe: Partial<{
+    title: string;
+    category: string;
+    cooktime: string;
+    servings: number;
+    ingredients: string;
+    instructions: string;
+  }>;
+  setNewRecipe: React.Dispatch<React.SetStateAction<Partial<{
+    title: string;
+    category: string;
+    cooktime: string;
+    servings: number;
+    ingredients: string;
+    instructions: string;
+  }>>>;
   handleAddRecipe: () => void;
-  onAddRecipe: any;
 }
 
-const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewRecipe, handleAddRecipe }) => {
+export default function AddRecipeDialog({ isOpen, onClose, newRecipe, setNewRecipe, handleAddRecipe }: AddRecipeDialogProps) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="w-full md:w-auto">
-          <Plus className="mr-2 h-4 w-4" /> Add Recipe
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Recipe</DialogTitle>
@@ -44,20 +44,20 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
               Title
             </Label>
             <Input
+              
               id="title"
               value={newRecipe.title}
               onChange={(e) => setNewRecipe({...newRecipe, title: e.target.value})}
               className="col-span-3"
-              required
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="category" className="text-right">
               Category
             </Label>
-            <Select onValueChange={(value) => setNewRecipe({...newRecipe, category: value})}>
+            <Select value={newRecipe.category} onValueChange={(value) => setNewRecipe({...newRecipe, category: value})}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select category"/>
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Breakfast">Breakfast</SelectItem>
@@ -77,7 +77,6 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
               onChange={(e) => setNewRecipe({...newRecipe, cooktime: e.target.value})}
               className="col-span-3"
               placeholder="e.g., 30 mins"
-              required
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -90,7 +89,6 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
               onChange={(e) => setNewRecipe({...newRecipe, servings: parseInt(e.target.value)})}
               className="col-span-3"
               type="number"
-              required
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -102,7 +100,6 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
               value={newRecipe.ingredients}
               onChange={(e) => setNewRecipe({...newRecipe, ingredients: e.target.value})}
               className="col-span-3"
-              required
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -114,7 +111,6 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
               value={newRecipe.instructions}
               onChange={(e) => setNewRecipe({...newRecipe, instructions: e.target.value})}
               className="col-span-3"
-              required
             />
           </div>
         </div>
@@ -125,5 +121,3 @@ const AddRecipeDialog: React.FC<AddRecipeDialogProps> = ({ newRecipe, setNewReci
     </Dialog>
   )
 }
-
-export default AddRecipeDialog

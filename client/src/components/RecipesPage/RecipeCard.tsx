@@ -1,28 +1,24 @@
 import React from "react"
 import { Card, CardContent } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
-import { ChefHat, Clock, Users, BookOpen, Heart, Share2 } from "lucide-react"
-
-interface Recipe {
-  id: number;
-  title: string;
-  category: string;
-  cooktime: string;
-  servings: number;
-  image: string;
-  ingredients: string;
-  instructions: string;
-  isFavorite: boolean;
-  dateadded: Date;
-}
+import { ChefHat, Clock, Users, BookOpen, Heart, Share2, Trash2 } from "lucide-react"
 
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: {
+    id: number;
+    title: string;
+    category: string;
+    cooktime: string;
+    servings: number;
+    image: string;
+    isFavorite: boolean;
+  };
   onView: () => void;
   onToggleFavorite: () => void;
+  onDelete: () => void;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite, onDelete }: RecipeCardProps) => {
   return (
     <Card className="overflow-hidden">
       <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
@@ -51,6 +47,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorit
             <Button variant="ghost" size="sm" onClick={onToggleFavorite}>
               <Heart className={`h-4 w-4 ${recipe.isFavorite ? 'fill-current text-red-500' : ''}`} />
             </Button>
+              <Button variant="ghost" size="sm" onClick={onDelete}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             <Button variant="ghost" size="sm">
               <Share2 className="h-4 w-4" />
             </Button>

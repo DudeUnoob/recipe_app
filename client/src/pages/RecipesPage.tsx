@@ -1,31 +1,16 @@
-import React, { useState, useEffect } from "react"
-//import { Button } from "../components/ui/button"
+import { useState, useEffect } from "react"
+import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Search } from "lucide-react"
+import { Search, Plus } from "lucide-react"
 import RecipeCard from "../components/RecipesPage/RecipeCard"
 import AddRecipeDialog from "../components/RecipesPage/AddRecipeDialog"
 import ViewRecipeDialog from "../components/RecipesPage/ViewRecipeDialog"
 import imageApi from "../functions/imageApi"
 import { supabase } from "../lib/supabase"
 import { useAuth } from "../contexts/AuthContext"
-
-
-// Initial mock data for recipes
-let initialRecipes = [
-  { id: 1, title: "Spaghetti Carbonara", category: "Dinner", cooktime: "30 mins", servings: 4, image: "/placeholder.svg?height=200&width=300", ingredients: "400g spaghetti, 200g pancetta, 4 eggs, 100g Parmesan cheese, Black pepper", instructions: "1. Cook pasta. 2. Fry pancetta. 3. Mix eggs and cheese. 4. Combine all ingredients.", isFavorite: false, dateadded: new Date() },
-  { id: 2, title: "Avocado Toast", category: "Breakfast", cooktime: "10 mins", servings: 2, image: "/placeholder.svg?height=200&width=300", ingredients: "2 slices bread, 1 ripe avocado, Salt, Pepper, Red pepper flakes", instructions: "1. Toast bread. 2. Mash avocado. 3. Spread on toast. 4. Season and serve.", isFavorite: false, dateadded: new Date() },
-  { id: 3, title: "Chicken Stir Fry", category: "Dinner", cooktime: "25 mins", servings: 3, image: "/placeholder.svg?height=200&width=300", ingredients: "500g chicken breast, Mixed vegetables, Soy sauce, Ginger, Garlic", instructions: "1. Cut chicken. 2. Stir-fry vegetables. 3. Add chicken. 4. Season with sauce.", isFavorite: false, dateadded: new Date() },
-]
-
-initialRecipes.forEach(async(item) => {
-  const newImage: any = await imageApi(item.title);
-  item.image = newImage.results[0].urls.raw
-})
-
-
-
+import { toast } from "../hooks/use-toast"
 
 interface Recipe {
   id: number;
@@ -38,93 +23,164 @@ interface Recipe {
   instructions: string;
   isFavorite: boolean;
   dateadded: Date;
+  user_id: string;
 }
 
-const RecipesPage: React.FC = () => {
-  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes)
+export default function RecipesPage() {
+  const [recipes, setRecipes] = useState<Recipe[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [activeTab, setActiveTab] = useState("all")
+  const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false)
   const { user } = useAuth()
 
+  useEffect(() => {
+    fetchRecipes()
+  }, [user])
 
+  const fetchRecipes = async () => {
+    if (user) {
+      const { data, error } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("user_id", user.id)
+        .order('dateadded', { ascending: false })
 
+      if (error) {
+        console.error("Error fetching recipes:", error)
+        toast({
+          title: "Error",
+          description: "Failed to fetch recipes. Please try again.",
+          variant: "destructive",
+        })
+      } else {
+        setRecipes(data || [])
+      }
+    }
+  }
 
-  let filteredRecipes = recipes.filter(recipe => 
+  const handleAddRecipe = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add a recipe.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // if (!newRecipe.title || !newRecipe.category || !newRecipe.cooktime || !newRecipe.servings || !newRecipe.ingredients || !newRecipe.instructions) {
+    //   toast({
+    //     title: "Error",
+    //     description: "Please fill out all fields.",
+    //     variant: "destructive",
+    //   })
+    //   console.log("Fill out fields")
+
+    //   return
+    // }
+
+    try {
+      const imageResult: any = await imageApi(newRecipe.title)
+      const imageUrl = imageResult.results[0].urls.raw
+
+      const { data, error } = await supabase
+        .from("recipes")
+        .insert([
+          {
+            ...newRecipe,
+            image: imageUrl,
+            isFavorite: false,
+            dateadded: new Date().toISOString(),
+            user_id: user.id,
+            id: recipes.length + 1
+          }
+        ])
+        .select()
+
+      if (error) throw error
+
+      setRecipes([data[0], ...recipes])
+      setNewRecipe({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
+      setIsAddRecipeDialogOpen(false)
+      toast({
+        title: "Success",
+        description: "Recipe added successfully!",
+      })
+    } catch (error) {
+      console.error("Error adding recipe:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add recipe. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const toggleFavorite = async (id: number) => {
+    try {
+      const recipeToUpdate = recipes.find(recipe => recipe.id === id)
+      if (!recipeToUpdate) return
+
+      const { error } = await supabase
+        .from("recipes")
+        .update({ isFavorite: !recipeToUpdate.isFavorite })
+        .eq("id", id)
+        .select()
+
+      if (error) throw error
+
+      setRecipes(recipes.map(recipe => 
+        recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+      ))
+
+      toast({
+        title: "Success",
+        description: `Recipe ${recipeToUpdate.isFavorite ? "removed from" : "added to"} favorites.`,
+      })
+    } catch (error) {
+      console.error("Error updating favorite status:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update favorite status. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const deleteRecipe = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from("recipes")
+        .delete()
+        .eq("id", id)
+
+      if (error) throw error
+
+      setRecipes(recipes.filter(recipe => recipe.id !== id))
+      toast({
+        title: "Success",
+        description: "Recipe deleted successfully.",
+      })
+    } catch (error) {
+      console.error("Error deleting recipe:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete recipe. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const filteredRecipes = recipes.filter(recipe => 
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (selectedCategory === "All" || recipe.category === selectedCategory)
   )
 
-
-  getUserRecipes()
-  async function getUserRecipes() {
-    let fetchData = await supabase.from("recipes").select("*")
-    .eq("user_id", user?.id)
-
-    console.log(fetchData.data, filteredRecipes)
-
-  }
-
-  
-
-
   const favoriteRecipes = recipes.filter(recipe => recipe.isFavorite)
-  const recentlyAddedRecipes = [...recipes].sort((a, b) => b.dateadded.getTime() - a.dateadded.getTime()).slice(0, 5)
-
-
-
-  const handleAddRecipe = async() => {
-
-    const callNewRecipeImage = async (title: any) => {
-      try {
-        const newImage: any = await imageApi(title);  // Assuming imageApi fetches images.
-        return newImage.results[0].urls.raw;          // Make sure this API structure is correct.
-      } catch (error) {
-        console.error("Error fetching image:", error);
-        return ""; // Handle the error by returning an empty string or default image.
-      }
-    }
-    
-    const imageUrl = await callNewRecipeImage(newRecipe.title);  // Await the result here.
-  
-    const recipeToAdd: Recipe = {
-      ...newRecipe as Recipe,
-      id: recipes.length + 1,
-      image: imageUrl,
-      isFavorite: false,
-      dateadded: new Date(),
-    };
-
-      await supabase.from("recipes").insert([
-      { title: newRecipe.title, id: recipes.length + 1,  category: newRecipe.category, cooktime: newRecipe.cooktime,
-        servings: newRecipe.servings, ingredients: newRecipe.ingredients, instructions: newRecipe.instructions,
-        image: imageUrl,
-        isFavorite: false,
-        dateadded: new Date()
-      }
-    ]).select()
-
-
-
-    setRecipes([...recipes, recipeToAdd])
-    setNewRecipe({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
-
-    
-  }
-
-  const toggleFavorite = (id: number) => {
-    setRecipes(recipes.map(recipe => 
-      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
-    ))
-  }
-
-  useEffect(() => {
-    if (activeTab === "favorites" && favoriteRecipes.length === 0) {
-      setActiveTab("all")
-    }
-  }, [favoriteRecipes, activeTab])
+  const recentlyAddedRecipes = recipes.slice(0, 5)
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -157,7 +213,9 @@ const RecipesPage: React.FC = () => {
               </SelectContent>
             </Select>
             
-            <AddRecipeDialog newRecipe={newRecipe} setNewRecipe={setNewRecipe} handleAddRecipe={handleAddRecipe} onAddRecipe={null} />
+            <Button onClick={() => setIsAddRecipeDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" /> Add Recipe
+            </Button>
           </div>
         </div>
         
@@ -176,6 +234,7 @@ const RecipesPage: React.FC = () => {
                   recipe={recipe} 
                   onView={() => setSelectedRecipe(recipe)}
                   onToggleFavorite={() => toggleFavorite(recipe.id)}
+                  onDelete={() => deleteRecipe(recipe.id)}
                 />
               ))}
             </div>
@@ -190,6 +249,7 @@ const RecipesPage: React.FC = () => {
                     recipe={recipe} 
                     onView={() => setSelectedRecipe(recipe)}
                     onToggleFavorite={() => toggleFavorite(recipe.id)}
+                    onDelete={() => deleteRecipe(recipe.id)}
                   />
                 ))}
               </div>
@@ -206,6 +266,7 @@ const RecipesPage: React.FC = () => {
                   recipe={recipe} 
                   onView={() => setSelectedRecipe(recipe)}
                   onToggleFavorite={() => toggleFavorite(recipe.id)}
+                  onDelete={() => deleteRecipe(recipe.id)}
                 />
               ))}
             </div>
@@ -213,11 +274,17 @@ const RecipesPage: React.FC = () => {
         </Tabs>
       </main>
 
+      <AddRecipeDialog
+        isOpen={isAddRecipeDialogOpen}
+        onClose={() => setIsAddRecipeDialogOpen(false)}
+        newRecipe={newRecipe}
+        setNewRecipe={setNewRecipe}
+        handleAddRecipe={handleAddRecipe}
+      />
+
       {selectedRecipe && (
         <ViewRecipeDialog recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
       )}
     </div>
   )
 }
-
-export default RecipesPage
