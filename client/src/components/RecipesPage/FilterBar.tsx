@@ -1,8 +1,7 @@
 import { useState } from "react"
+import { Button } from "../../components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
-import AddRecipeDialog from "./AddRecipeDialog"
-// import imageApi from "../../functions/imageApi";
-
+import AddRecipeDialog from "./AddRecipeDialog";
 interface Recipe {
   title: string;
   category: string;
@@ -14,23 +13,24 @@ interface Recipe {
 }
 
 interface FilterBarProps {
-  selectedCategory: string
-  setSelectedCategory: (category: string) => void
-  onAddRecipe: (newRecipe: Recipe) => void
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  onAddRecipe: (newRecipe: Recipe) => void;
 }
 
 export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }: FilterBarProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({});
 
-  // const callNewRecipeImage = async() => {
-  //   const newImage: any = await imageApi(newRecipe.title);
-  //   newImage.image = newImage.results[0].urls.raw
-  // }
-
   const handleAddRecipe = () => {
-    if (newRecipe.title && newRecipe.category && newRecipe.cooktime && newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
-      onAddRecipe(newRecipe as Recipe);
+    if (newRecipe.title && newRecipe.category && newRecipe.cooktime && 
+        newRecipe.servings && newRecipe.ingredients && newRecipe.instructions) {
+      onAddRecipe({
+        ...newRecipe,
+        image: '', // Set a default or handle image separately
+      } as Recipe);
       setNewRecipe({});
+      setIsDialogOpen(false);
     }
   };
 
@@ -49,11 +49,16 @@ export function FilterBar({ selectedCategory, setSelectedCategory, onAddRecipe }
         </SelectContent>
       </Select>
       
+      <Button onClick={() => setIsDialogOpen(true)}>
+        Add Recipe
+      </Button>
+
       <AddRecipeDialog 
-        newRecipe={newRecipe} 
-        setNewRecipe={setNewRecipe} 
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        newRecipe={newRecipe}
+        setNewRecipe={setNewRecipe}
         handleAddRecipe={handleAddRecipe}
-        onAddRecipe={onAddRecipe}
       />
     </div>
   )

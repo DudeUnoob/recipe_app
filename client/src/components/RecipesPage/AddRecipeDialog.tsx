@@ -16,6 +16,7 @@ interface AddRecipeDialogProps {
     servings: number;
     ingredients: string;
     instructions: string;
+    image: string;
   }>;
   setNewRecipe: React.Dispatch<React.SetStateAction<Partial<{
     title: string;
@@ -24,6 +25,7 @@ interface AddRecipeDialogProps {
     servings: number;
     ingredients: string;
     instructions: string;
+    image: string;
   }>>>;
   handleAddRecipe: () => void;
 }
@@ -44,7 +46,6 @@ export default function AddRecipeDialog({ isOpen, onClose, newRecipe, setNewReci
               Title
             </Label>
             <Input
-              
               id="title"
               value={newRecipe.title}
               onChange={(e) => setNewRecipe({...newRecipe, title: e.target.value})}
