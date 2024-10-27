@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Search, Plus } from "lucide-react"
 import RecipeCard from "../components/RecipesPage/RecipeCard"
 import AddRecipeDialog from "../components/RecipesPage/AddRecipeDialog"
+import EditRecipeDialog from "../components/RecipesPage/EditRecipeDialog"
 import ViewRecipeDialog from "../components/RecipesPage/ViewRecipeDialog"
 import imageApi from "../functions/imageApi"
 import { supabase } from "../lib/supabase"
@@ -32,8 +33,10 @@ export default function RecipesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({ title: "", category: "", cooktime: "", servings: 0, ingredients: "", instructions: "" })
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null)
   const [activeTab, setActiveTab] = useState("all")
   const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false)
+  const [isEditRecipeDialogOpen, setIsEditRecipeDialogOpen] = useState(false)
   const { user } = useAuth()
 
   useEffect(() => {
@@ -71,16 +74,14 @@ export default function RecipesPage() {
       return
     }
 
-    // if (!newRecipe.title || !newRecipe.category || !newRecipe.cooktime || !newRecipe.servings || !newRecipe.ingredients || !newRecipe.instructions) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Please fill out all fields.",
-    //     variant: "destructive",
-    //   })
-    //   console.log("Fill out fields")
-
-    //   return
-    // }
+    if (!newRecipe.title || !newRecipe.category || !newRecipe.cooktime || !newRecipe.servings || !newRecipe.ingredients || !newRecipe.instructions) {
+      toast({
+        title: "Error",
+        description: "Please fill out all fields.",
+        variant: "destructive",
+      })
+      return
+    }
 
     try {
       const imageResult: any = await imageApi(newRecipe.title)
@@ -94,8 +95,7 @@ export default function RecipesPage() {
             image: imageUrl,
             isFavorite: false,
             dateadded: new Date().toISOString(),
-            user_id: user.id,
-            id: recipes.length + 1
+            user_id: user.id
           }
         ])
         .select()
@@ -119,12 +119,39 @@ export default function RecipesPage() {
     }
   }
 
+  const handleEditRecipe = async (updatedRecipe: Recipe) => {
+    try {
+      const { data, error } = await supabase
+        .from("recipes")
+        .update(updatedRecipe)
+        .eq("id", updatedRecipe.id)
+        .select()
+
+      if (error) throw error
+
+      setRecipes(recipes.map(recipe => recipe.id === updatedRecipe.id ? data[0] : recipe))
+      setIsEditRecipeDialogOpen(false)
+      setEditingRecipe(null)
+      toast({
+        title: "Success",
+        description: "Recipe updated successfully!",
+      })
+    } catch (error) {
+      console.error("Error updating recipe:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update recipe. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   const toggleFavorite = async (id: number) => {
     try {
       const recipeToUpdate = recipes.find(recipe => recipe.id === id)
       if (!recipeToUpdate) return
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("recipes")
         .update({ isFavorite: !recipeToUpdate.isFavorite })
         .eq("id", id)
@@ -235,6 +262,10 @@ export default function RecipesPage() {
                   onView={() => setSelectedRecipe(recipe)}
                   onToggleFavorite={() => toggleFavorite(recipe.id)}
                   onDelete={() => deleteRecipe(recipe.id)}
+                  onEdit={() => {
+                    setEditingRecipe(recipe)
+                    setIsEditRecipeDialogOpen(true)
+                  }}
                 />
               ))}
             </div>
@@ -250,6 +281,10 @@ export default function RecipesPage() {
                     onView={() => setSelectedRecipe(recipe)}
                     onToggleFavorite={() => toggleFavorite(recipe.id)}
                     onDelete={() => deleteRecipe(recipe.id)}
+                    onEdit={() => {
+                      setEditingRecipe(recipe)
+                      setIsEditRecipeDialogOpen(true)
+                    }}
                   />
                 ))}
               </div>
@@ -267,6 +302,10 @@ export default function RecipesPage() {
                   onView={() => setSelectedRecipe(recipe)}
                   onToggleFavorite={() => toggleFavorite(recipe.id)}
                   onDelete={() => deleteRecipe(recipe.id)}
+                  onEdit={() => {
+                    setEditingRecipe(recipe)
+                    setIsEditRecipeDialogOpen(true)
+                  }}
                 />
               ))}
             </div>
@@ -280,6 +319,16 @@ export default function RecipesPage() {
         newRecipe={newRecipe}
         setNewRecipe={setNewRecipe}
         handleAddRecipe={handleAddRecipe}
+      />
+
+      <EditRecipeDialog
+        isOpen={isEditRecipeDialogOpen}
+        onClose={() => {
+          setIsEditRecipeDialogOpen(false)
+          setEditingRecipe(null)
+        }}
+        recipe={editingRecipe}
+        handleEditRecipe={handleEditRecipe}
       />
 
       {selectedRecipe && (

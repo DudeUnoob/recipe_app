@@ -1,7 +1,7 @@
 import React from "react"
 import { Card, CardContent } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
-import { ChefHat, Clock, Users, BookOpen, Heart, Share2, Trash2 } from "lucide-react"
+import { ChefHat, Clock, Users, BookOpen, Heart, Share2, Trash2, Edit } from "lucide-react"
 
 interface RecipeCardProps {
   recipe: {
@@ -16,9 +16,10 @@ interface RecipeCardProps {
   onView: () => void;
   onToggleFavorite: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite, onDelete }: RecipeCardProps) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite, onDelete, onEdit }: RecipeCardProps) => {
   return (
     <Card className="overflow-hidden">
       <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
@@ -46,6 +47,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorit
           <div className="flex space-x-2">
             <Button variant="ghost" size="sm" onClick={onToggleFavorite}>
               <Heart className={`h-4 w-4 ${recipe.isFavorite ? 'fill-current text-red-500' : ''}`} />
+            </Button>
+            <Button variant={"ghost"} size={"sm"} onClick={onEdit}>
+              <Edit className="h-4 w-4"/>
             </Button>
               <Button variant="ghost" size="sm" onClick={onDelete}>
                 <Trash2 className="h-4 w-4" />

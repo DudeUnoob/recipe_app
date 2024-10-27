@@ -12,26 +12,25 @@ export interface Recipe {
   ingredients: string;
   instructions: string;
   isFavorite: boolean;
-  dateadded: Date;
+  dateadded: string;
+  user_id: string;
 }
 
 interface RecipeTabsProps {
   filteredRecipes: Recipe[];
+  onView: (recipe: Recipe) => void;
+  onToggleFavorite: (id: number) => void;
+  onDelete: (id: number) => void;
+  onEdit: (recipe: Recipe) => void;
 }
 
-const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
-  const handleViewRecipe = (id: number) => {
-    console.log(`Viewing recipe with id: ${id}`);
-  };
-
-  const handleToggleFavorite = (id: number) => {
-    console.log(`Toggling favorite for recipe with id: ${id}`);
-  };
-
-  const handleDeleteRecipe = (id: number) => {
-    console.log(`Deleting recipe with id: ${id}`);
-  };
-
+const RecipeTabs: React.FC<RecipeTabsProps> = ({ 
+  filteredRecipes, 
+  onView, 
+  onToggleFavorite, 
+  onDelete, 
+  onEdit 
+}) => {
   return (
     <Tabs defaultValue="all" className="w-full">
       <TabsList className="mb-8">
@@ -46,9 +45,10 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
             <RecipeCard 
               key={recipe.id} 
               recipe={recipe} 
-              onView={() => handleViewRecipe(recipe.id)}
-              onToggleFavorite={() => handleToggleFavorite(recipe.id)}
-              onDelete={() => handleDeleteRecipe(recipe.id)}
+              onView={() => onView(recipe)}
+              onToggleFavorite={() => onToggleFavorite(recipe.id)}
+              onDelete={() => onDelete(recipe.id)}
+              onEdit={() => onEdit(recipe)}
             />
           ))}
         </div>
@@ -62,9 +62,10 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
               <RecipeCard 
                 key={recipe.id} 
                 recipe={recipe} 
-                onView={() => handleViewRecipe(recipe.id)}
-                onToggleFavorite={() => handleToggleFavorite(recipe.id)}
-                onDelete={() => handleDeleteRecipe(recipe.id)}
+                onView={() => onView(recipe)}
+                onToggleFavorite={() => onToggleFavorite(recipe.id)}
+                onDelete={() => onDelete(recipe.id)}
+                onEdit={() => onEdit(recipe)}
               />
             ))}
         </div>
@@ -73,14 +74,16 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
       <TabsContent value="recent">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRecipes
-            .sort((a, b) => b.dateadded.getTime() - a.dateadded.getTime())
+            .sort((a, b) => new Date(b.dateadded).getTime() - new Date(a.dateadded).getTime())
+            .slice(0, 5)
             .map((recipe) => (
               <RecipeCard 
                 key={recipe.id} 
                 recipe={recipe} 
-                onView={() => handleViewRecipe(recipe.id)}
-                onToggleFavorite={() => handleToggleFavorite(recipe.id)}
-                onDelete={() => handleDeleteRecipe(recipe.id)}
+                onView={() => onView(recipe)}
+                onToggleFavorite={() => onToggleFavorite(recipe.id)}
+                onDelete={() => onDelete(recipe.id)}
+                onEdit={() => onEdit(recipe)}
               />
             ))}
         </div>
