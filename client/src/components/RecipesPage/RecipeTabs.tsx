@@ -28,6 +28,10 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
     console.log(`Toggling favorite for recipe with id: ${id}`);
   };
 
+  const handleDeleteRecipe = (id: number) => {
+    console.log(`Deleting recipe with id: ${id}`);
+  };
+
   return (
     <Tabs defaultValue="all" className="w-full">
       <TabsList className="mb-8">
@@ -44,17 +48,42 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({ filteredRecipes }) => {
               recipe={recipe} 
               onView={() => handleViewRecipe(recipe.id)}
               onToggleFavorite={() => handleToggleFavorite(recipe.id)}
+              onDelete={() => handleDeleteRecipe(recipe.id)}
             />
           ))}
         </div>
       </TabsContent>
       
       <TabsContent value="favorites">
-        <p>Your favorite recipes will appear here.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRecipes
+            .filter(recipe => recipe.isFavorite)
+            .map((recipe) => (
+              <RecipeCard 
+                key={recipe.id} 
+                recipe={recipe} 
+                onView={() => handleViewRecipe(recipe.id)}
+                onToggleFavorite={() => handleToggleFavorite(recipe.id)}
+                onDelete={() => handleDeleteRecipe(recipe.id)}
+              />
+            ))}
+        </div>
       </TabsContent>
       
       <TabsContent value="recent">
-        <p>Your recently added recipes will appear here.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredRecipes
+            .sort((a, b) => b.dateadded.getTime() - a.dateadded.getTime())
+            .map((recipe) => (
+              <RecipeCard 
+                key={recipe.id} 
+                recipe={recipe} 
+                onView={() => handleViewRecipe(recipe.id)}
+                onToggleFavorite={() => handleToggleFavorite(recipe.id)}
+                onDelete={() => handleDeleteRecipe(recipe.id)}
+              />
+            ))}
+        </div>
       </TabsContent>
     </Tabs>
   );
