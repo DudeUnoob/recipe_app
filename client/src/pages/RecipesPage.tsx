@@ -85,7 +85,7 @@ export default function RecipesPage() {
 
     try {
       const imageResult: any = await imageApi(newRecipe.title)
-      const imageUrl = imageResult.results[0].urls.raw
+      const imageUrl = imageResult.results[0].urls.regular
 
       const { data, error } = await supabase
         .from("recipes")
