@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { useAuth } from "../contexts/AuthContext"
 
 export default function Navbar() {
@@ -89,15 +90,29 @@ export default function Navbar() {
             <NavItems />
           </div>
           <div className="flex items-center">
-            <div className="hidden lg:flex space-x-4">
+            <div className="hidden lg:flex items-center space-x-4">
               {!loading && (
-                <Button 
-                  variant="ghost" 
-                  className="text-gray-700 hover:text-gray-900"
-                  onClick={() => user ? handleSignOut() : navigate('/login')}
-                >
-                  {user ? "Log out" : "Log in"}
-                </Button>
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-gray-700 hover:text-gray-900"
+                    onClick={() => user ? handleSignOut() : navigate('/login')}
+                  >
+                    {user ? "Log out" : "Log in"}
+                  </Button>
+                  {user && (
+                    <Button
+                      variant="ghost"
+                      className="p-0"
+                      onClick={() => navigate('/settings')}
+                    >
+                      <Avatar>
+                        <AvatarImage src={user.user_metadata.avatar_url || undefined} alt="User avatar" />
+                        <AvatarFallback>{user.email ? user.email[0].toUpperCase() : 'U'}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  )}
+                </>
               )}
               {!user && !loading && (
                 <Button 
@@ -132,14 +147,27 @@ export default function Navbar() {
                   <div className="flex flex-col space-y-4">
                     <NavItems />
                     {!loading && (
-                      <Button 
-                        variant="ghost" 
-                        className="justify-start"
-                        onClick={() => user ? handleSignOut() : navigate('/login')}
-                      >
-                       
-                        {user ? "Log out": "Log in"}
-                      </Button>
+                      <div className="flex items-center space-x-4">
+                        <Button 
+                          variant="ghost" 
+                          className="justify-start"
+                          onClick={() => user ? handleSignOut() : navigate('/login')}
+                        >
+                          {user ? "Log out" : "Log in"}
+                        </Button>
+                        {user && (
+                          <Button
+                            variant="ghost"
+                            className="p-0"
+                            onClick={() => navigate('/settings')}
+                          >
+                            <Avatar>
+                              <AvatarImage src={user.user_metadata.avatar_url || undefined} alt="User avatar" />
+                              <AvatarFallback>{user.email ? user.email[0].toUpperCase() : 'U'}</AvatarFallback>
+                            </Avatar>
+                          </Button>
+                        )}
+                      </div>
                     )}
                     {!user && !loading && (
                       <Button 

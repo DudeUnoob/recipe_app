@@ -8,6 +8,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AboutPage from './pages/AboutPage';
 import RecipesPage from './pages/RecipesPage';
+import SettingsPage from './pages/SettingsPage';
 
 const App: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const App: React.FC = () => {
             <Route element={<ProtectedRoute />}>
               <Route path='/dashboard' element={<Dashboard />}/>
               <Route path='/recipes' element={<RecipesPage />} />
+              <Route path="/settings" element={<SettingsPage />}/>
               {/* Add other protected routes here */}
             </Route>
           </Routes>
