@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AboutPage from './pages/AboutPage';
 import RecipesPage from './pages/RecipesPage';
 import SettingsPage from './pages/SettingsPage';
+import AIRecipeAssistant from './pages/AIRecipeAssistant';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
               <Route path='/dashboard' element={<Dashboard />}/>
               <Route path='/recipes' element={<RecipesPage />} />
               <Route path="/settings" element={<SettingsPage />}/>
+              <Route path="/aiservice" element={<AIRecipeAssistant />}/>
               {/* Add other protected routes here */}
             </Route>
           </Routes>

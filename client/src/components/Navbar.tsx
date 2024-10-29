@@ -72,6 +72,9 @@ export default function Navbar() {
       <Link to="/about" className="text-gray-700 hover:text-gray-900 py-2 lg:py-0 transition duration-150 ease-in-out">
         About
       </Link>
+      <Link to="/aiservice" className="text-gray-700 hover:text-gray-900 py-2 lg:py-0 transition duration-150 ease-in-out">
+      AI Service
+      </Link>
     </div>
   ))
   NavItems.displayName = "NavItems"
