@@ -1,17 +1,18 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/button'
-//import { Input } from '../components/ui/input'
+import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
 import { Card } from '../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { toast } from "../hooks/use-toast"
-import { Loader2 } from 'lucide-react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion'
+import { toast } from '../hooks/use-toast'
+import { Loader2, Plus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 // Assume we have these AI service functions
@@ -21,6 +22,7 @@ import {
   getPersonalizedRecommendations, 
   getNutritionalAnalysis 
 } from '../services/aiService'
+import imageApi from '../functions/imageApi'
 
 interface UserPreferences {
   vegetarian: boolean
@@ -36,7 +38,14 @@ interface Recipe {
   title: string
   ingredients: string
   instructions: string
-  description: string
+  category: string
+}
+
+interface Recommendation {
+  title: string
+  category: string
+  ingredients: string[]
+  instructions: string
 }
 
 export default function AIRecipeAssistant() {
@@ -47,7 +56,7 @@ export default function AIRecipeAssistant() {
   const [recipeToEnhance, setRecipeToEnhance] = useState('')
   const [generatedRecipe, setGeneratedRecipe] = useState('')
   const [enhancedRecipe, setEnhancedRecipe] = useState('')
-  const [recommendations, setRecommendations] = useState<string[]>([])
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
   const [nutritionalInfo, setNutritionalInfo] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([])
@@ -58,7 +67,6 @@ export default function AIRecipeAssistant() {
       navigate('/login')
     } else {
       fetchUserPreferences()
-      fetchPersonalizedRecommendations()
       fetchUserRecipes()
     }
   }, [user, navigate])
@@ -94,6 +102,7 @@ export default function AIRecipeAssistant() {
       if (error) throw error
 
       setUserRecipes(data)
+      generatePersonalizedRecommendations(data)
     } catch (error) {
       console.error('Error fetching user recipes:', error)
       toast({
@@ -104,21 +113,53 @@ export default function AIRecipeAssistant() {
     }
   }
 
-  const fetchPersonalizedRecommendations = async () => {
+  const generatePersonalizedRecommendations = async (recipes: Recipe[]) => {
     setIsLoading(true)
     try {
-      const recommendations = await getPersonalizedRecommendations(user?.id, userPreferences)
-      setRecommendations(recommendations)
+      const recommendationsString = await getPersonalizedRecommendations(recipes, userPreferences)
+      const parsedRecommendations = parseRecommendations(recommendationsString)
+      setRecommendations(parsedRecommendations)
     } catch (error) {
-      console.error('Error fetching personalized recommendations:', error)
+      console.error('Error generating personalized recommendations:', error)
       toast({
         title: 'Error',
-        description: 'Failed to fetch recommendations. Please try again.',
+        description: 'Failed to generate recommendations. Please try again.',
         variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const parseRecommendations = (recommendationsString: string): Recommendation[] => {
+    const sections = recommendationsString.split(/\*\*(Breakfast Ideas|Similar Recipes|Dessert Suggestions):\*\*/g)
+    const parsedRecommendations: Recommendation[] = []
+
+    for (let i = 1; i < sections.length; i += 2) {
+      const category = sections[i].trim()
+      const recipes = sections[i + 1].trim().split(/\d+\.\s+\*\*/).slice(1)
+
+      recipes.forEach(recipe => {
+        const [title, ...rest] = recipe.split('**:')
+        const content = rest.join('**:').trim()
+        const ingredientsMatch = content.match(/Ingredients:([\s\S]*?)Instructions:/)
+        const instructionsMatch = content.match(/Instructions:([\s\S]*)/)
+
+        const ingredients = ingredientsMatch 
+          ? ingredientsMatch[1].trim().split('\n').map(item => item.trim().replace(/^\*\s*/, ''))
+          : []
+        const instructions = instructionsMatch ? instructionsMatch[1].trim() : ''
+
+        parsedRecommendations.push({ 
+          title: title.trim(), 
+          category,
+          ingredients,
+          instructions
+        })
+      })
+    }
+
+    return parsedRecommendations
   }
 
   const handleGenerateRecipe = async () => {
@@ -145,7 +186,7 @@ export default function AIRecipeAssistant() {
       if (selectedRecipeId) {
         const selectedRecipe = userRecipes.find(recipe => recipe.id === selectedRecipeId)
         if (selectedRecipe) {
-          recipeToEnhanceContent = `Title: ${selectedRecipe.title}\nDescription: ${selectedRecipe.description}\nIngredients: ${selectedRecipe.ingredients}\nInstructions: ${selectedRecipe.instructions}`
+          recipeToEnhanceContent = `Title: ${selectedRecipe.title}\nIngredients: ${selectedRecipe.ingredients}\nInstructions: ${selectedRecipe.instructions}`
         }
       }
       const enhanced = await enhanceRecipe(recipeToEnhanceContent, userPreferences)
@@ -176,6 +217,40 @@ export default function AIRecipeAssistant() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleSaveRecommendation = async (recommendation: Recommendation) => {
+    try {
+      const imageResult: any = await imageApi(recommendation.title)
+      const imageUrl = imageResult.results[0].urls.regular
+
+      const { data, error } = await supabase
+        .from('recipes')
+        .insert({
+          user_id: user?.id,
+          title: recommendation.title,
+          category: recommendation.category,
+          ingredients: recommendation.ingredients.join('\n'),
+          instructions: recommendation.instructions,
+          image: imageUrl
+        })
+        .select()
+
+      if (error) throw error
+
+      setUserRecipes([...userRecipes, data[0]])
+      toast({
+        title: 'Success',
+        description: 'Recipe saved successfully!',
+      })
+    } catch (error) {
+      console.error('Error saving recipe:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to save recipe. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -278,34 +353,49 @@ export default function AIRecipeAssistant() {
         <TabsContent value="recommendations">
           <Card className="p-6">
             <h2 className="text-2xl font-semibold mb-2">Personalized Recommendations</h2>
-            <p className="text-gray-600 mb-4">Discover recipes tailored to your preferences and history</p>
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Breakfast Ideas</h3>
-                <ul className="list-disc pl-5">
-                  {recommendations.slice(0, 3).map((recipe, index) => (
-                    <li key={index}>{recipe}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Similar Recipes</h3>
-                <ul className="list-disc pl-5">
-                  {recommendations.slice(3, 6).map((recipe, index) => (
-                    <li key={index}>{recipe}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Seasonal Suggestions</h3>
-                <ul className="list-disc pl-5">
-                  {recommendations.slice(6, 9).map((recipe, index) => (
-                    <li key={index}>{recipe}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <Button onClick={fetchPersonalizedRecommendations} className="mt-6" disabled={isLoading}>
+            <p className="text-gray-600 mb-4">Discover recipes similar to your saved recipes</p>
+            <Accordion type="single" collapsible className="w-full">
+              {['Breakfast Ideas', 'Similar Recipes', 'Dessert Suggestions'].map((category) => (
+                <AccordionItem value={category} key={category}>
+                  <AccordionTrigger>{category}</AccordionTrigger>
+                  <AccordionContent>
+                    {recommendations
+                      .filter(recipe => recipe.category === category)
+                      .map((recipe, index) => (
+                        <div key={index} className="mb-4 p-4 bg-gray-100 rounded-md">
+                          <h3 className="text-lg font-semibold">{recipe.title}</h3>
+                          <Accordion type="single" collapsible className="w-full mt-2">
+                            <AccordionItem value="ingredients">
+                              <AccordionTrigger>Ingredients</AccordionTrigger>
+                              <AccordionContent>
+                                <ul className="list-disc pl-5">
+                                  {recipe.ingredients.map((ingredient, i) => (
+                                    <li key={i} className="text-sm">{ingredient}</li>
+                                  ))}
+                                </ul>
+                              </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="instructions">
+                              <AccordionTrigger>Instructions</AccordionTrigger>
+                              <AccordionContent>
+                                <p className="text-sm whitespace-pre-wrap">{recipe.instructions}</p>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                          <Button  
+                            onClick={() => handleSaveRecommendation(recipe)} 
+                            className="mt-2" 
+                            size="sm"
+                          >
+                            <Plus className="mr-2 h-4 w-4" /> Save Recipe
+                          </Button>
+                        </div>
+                      ))}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+            <Button onClick={() => generatePersonalizedRecommendations(userRecipes)} className="mt-6" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Refresh Recommendations
             </Button>

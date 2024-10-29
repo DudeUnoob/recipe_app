@@ -24,7 +24,10 @@ class GenerateRecipeService extends Service {
                             messages: [{
                                 role: 'user',
                                 content: `Generate and give me some recipes I can create
-                                based off the ingredients provided: ${ingredients}`,
+                                based off the ingredients provided as well as the user's preferences/dietary restrictions: ${ingredients}
+                                \n\n\n
+                                User preferences/dietary restrictions: ${userPreferences}`,
+                                
                             }],
                             model: "llama3-8b-8192"
 
