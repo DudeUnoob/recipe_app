@@ -16,6 +16,9 @@ broker.createService(GenerateRecipeService);
 broker.createService(GetNutritionalAnalysisService);
 broker.createService(GetPersonalizedRecommendations);
 
+app.use(express.json())
+app.use(express.urlencoded())
+
 // Route to get user by ID
 app.get("/api/user/:id", async (req: Request, res: Response) => {
   try {
@@ -30,7 +33,12 @@ app.get("/api/user/:id", async (req: Request, res: Response) => {
 
 app.post('/api/generateRecipe', async(req: Request, res: Response) => {
     try{
-
+        const data = await broker.call("generateRecipe.generateRecipe", 
+            { ingredients: req.body.ingredients, userPreferences: req.body.userPreferences }
+        )
+        if(!data) return res.status(404).send("Error with your input")
+        
+        res.json(data)
     }
 
     catch(err) {
@@ -40,7 +48,16 @@ app.post('/api/generateRecipe', async(req: Request, res: Response) => {
 
 app.post("/api/enhanceRecipe", async(req: Request, res: Response) => {
     try{
+        const data = await broker.call("enhanceRecipe.enhanceRecipe",
+            {
+                recipeToEnhance: req.body.recipeToEnhance,
+                userPreferences: req.body.userPreferences
+            }
+        )
 
+        if(!data) return res.status(404).send("Error with your input")
+
+        res.json(data)
     }
     catch(err) {
         res.status(500).send("Error enhancing recipe")
@@ -50,7 +67,16 @@ app.post("/api/enhanceRecipe", async(req: Request, res: Response) => {
 app.post("/api/getPersonalizedRecommendations", async(req: Request, res: Response) => {
 
     try {
+        const data = await broker.call("getPersonalizedRecommendations.getPersonalizedRecommendations", 
+            {
+                user_id: req.body.user_id,
+                userPreferences: req.body.userPreferences,
+            }
+        )
 
+        if(!data) return res.status(404).send("Error with your input")
+
+        res.json(data)
     }
 
     catch(err) {
@@ -62,7 +88,15 @@ app.post("/api/getPersonalizedRecommendations", async(req: Request, res: Respons
 app.post("/api/getNutritionalAnalysis", async(req: Request, res: Response) => {
 
     try {
+        const data = await broker.call("getNutritionalAnalysis.getNutritionalAnalysis", 
+            {
+                finalRecipe: req.body.finalRecipe
+            }
+        )
 
+        if(!data) return res.status(404).send("Error getting input")
+
+        res.json(data)
     }
     catch(err) {
         res.status(500).send("Error getting nutritional analysis")

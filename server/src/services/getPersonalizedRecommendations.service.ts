@@ -12,13 +12,13 @@ class GetPersonalizedRecommendations extends Service {
                 getPersonalizedRecommendations: {
                     params: {
                         user_id: "string",
-                        user_preferences: "string"
+                        userPreferences: "string"
                     },
 
-                    async handler(ctx: Context<{ user_id: string, user_preferences: string }>) {
-                        const{ user_id, user_preferences } = ctx.params;
+                    async handler(ctx: Context<{ user_id: string, userPreferences: string }>) {
+                        const{ user_id, userPreferences } = ctx.params;
 
-                        return { message: user_id + user_preferences }
+                        return { message: user_id + userPreferences }
                     }
                 }
             }
