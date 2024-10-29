@@ -3,6 +3,9 @@ import { generateRecipe } from './api/recipe';
 // import Groq from 'groq-sdk';
 //import { getRecipeData } from "./db";
 import dotenv from 'dotenv';
+import { broker, app } from "./api/api.gateway";
+import { supabase } from './scripts/supabase';
+import { client } from './functions/groq';
 
 
 const envPath = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
@@ -11,9 +14,7 @@ dotenv.config({ path: envPath });
 
 
 // src/index.ts
-import { broker, app } from "./api/api.gateway";
-import { supabase } from './scripts/supabase';
-import { client } from './functions/groq';
+
 
 const PORT = 3000;
 

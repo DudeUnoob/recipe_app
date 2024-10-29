@@ -2,15 +2,26 @@ import axios from "axios";
 
 
 async function generateRecipe(ingredients: any, userPreferences: any) {
-    axios.get("")
-    console.log(ingredients, userPreferences)
+    const { data } = await axios.post(`http://localhost:3000/api/generateRecipe`, 
+        { ingredients: ingredients,  
+        userPreferences: JSON.stringify(userPreferences) 
+        },
+        {
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }
+        
+    )
 
-    return "hello"
+
+    return (data as any).message
 }
 
 async function enhanceRecipe(recipeToEnhance: any, userPreferences: any) {
     //both strings
     console.log(recipeToEnhance, userPreferences)
+
  return ""
 }
 
@@ -23,9 +34,17 @@ async function getPersonalizedRecommendations(user_id: any, userPreferences: any
 
 async function getNutritionalAnalysis(finalRecipe: any) {
     //string
-    const val = finalRecipe
+    const { data } = await axios.post(`http://localhost:3000/api/getNutritionalAnalysis`, 
+        { finalRecipe: finalRecipe },
+        {
+            headers: {
+                "Content-Type":"application/json"
+            }
+        }
 
-    return val;
+    )
+
+    return (data as any).message
 
 }
 

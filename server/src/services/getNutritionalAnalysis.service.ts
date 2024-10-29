@@ -1,5 +1,6 @@
 import { Service, ServiceBroker } from "moleculer";
 import { Context } from "moleculer";
+import { client } from "../functions/groq";
 
 class GetNutritionalAnalysisService extends Service {
 
@@ -18,7 +19,18 @@ class GetNutritionalAnalysisService extends Service {
 
                         const { finalRecipe } = ctx.params;
 
-                        return { message: finalRecipe }
+                        console.log("hitting nutrition endpoint")
+                        const chatCompletion = await client.chat.completions.create({
+                            messages: [{
+                                role: 'user',
+                                content: `Give me an indepth nutritional analysis based off the recipes in this message:
+                                ${finalRecipe}`,
+                            }],
+                            model: "llama3-8b-8192"
+
+                        })
+
+                        return { message: chatCompletion.choices[0].message.content }
                     }
                 }
             }

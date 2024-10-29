@@ -6,6 +6,7 @@ import EnhanceRecipeService from "../services/enhanceRecipe.service"
 import GenerateRecipeService from "../services/generateRecipe.service";
 import GetNutritionalAnalysisService from "../services/getNutritionalAnalysis.service";
 import GetPersonalizedRecommendations from "../services/getPersonalizedRecommendations.service";
+import cors from "cors"
 
 // Create an Express app and Moleculer broker
 const app = express();
@@ -16,6 +17,7 @@ broker.createService(GenerateRecipeService);
 broker.createService(GetNutritionalAnalysisService);
 broker.createService(GetPersonalizedRecommendations);
 
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded())
 

@@ -9,6 +9,7 @@ import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
 import { Card } from '../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { toast } from "../hooks/use-toast"
 import { Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -30,6 +31,14 @@ interface UserPreferences {
   otherRestrictions: string
 }
 
+interface Recipe {
+  id: number
+  title: string
+  ingredients: string
+  instructions: string
+  description: string
+}
+
 export default function AIRecipeAssistant() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -41,6 +50,8 @@ export default function AIRecipeAssistant() {
   const [recommendations, setRecommendations] = useState<string[]>([])
   const [nutritionalInfo, setNutritionalInfo] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [userRecipes, setUserRecipes] = useState<Recipe[]>([])
+  const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!user) {
@@ -48,6 +59,7 @@ export default function AIRecipeAssistant() {
     } else {
       fetchUserPreferences()
       fetchPersonalizedRecommendations()
+      fetchUserRecipes()
     }
   }, [user, navigate])
 
@@ -67,6 +79,26 @@ export default function AIRecipeAssistant() {
       toast({
         title: 'Error',
         description: 'Failed to fetch user preferences. Please try again.',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const fetchUserRecipes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setUserRecipes(data)
+    } catch (error) {
+      console.error('Error fetching user recipes:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch your recipes. Please try again.',
         variant: 'destructive',
       })
     }
@@ -109,7 +141,14 @@ export default function AIRecipeAssistant() {
   const handleEnhanceRecipe = async () => {
     setIsLoading(true)
     try {
-      const enhanced = await enhanceRecipe(recipeToEnhance, userPreferences)
+      let recipeToEnhanceContent = recipeToEnhance
+      if (selectedRecipeId) {
+        const selectedRecipe = userRecipes.find(recipe => recipe.id === selectedRecipeId)
+        if (selectedRecipe) {
+          recipeToEnhanceContent = `Title: ${selectedRecipe.title}\nDescription: ${selectedRecipe.description}\nIngredients: ${selectedRecipe.ingredients}\nInstructions: ${selectedRecipe.instructions}`
+        }
+      }
+      const enhanced = await enhanceRecipe(recipeToEnhanceContent, userPreferences)
       setEnhancedRecipe(enhanced)
     } catch (error) {
       console.error('Error enhancing recipe:', error)
@@ -190,10 +229,25 @@ export default function AIRecipeAssistant() {
         <TabsContent value="enhance">
           <Card className="p-6">
             <h2 className="text-2xl font-semibold mb-2">Enhance Recipe</h2>
-            <p className="text-gray-600 mb-4">Enter a recipe to enhance with better instructions, cooking tips, and more</p>
+            <p className="text-gray-600 mb-4">Enhance one of your saved recipes or enter a new recipe to enhance</p>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="recipeToEnhance">Recipe to Enhance</Label>
+                <Label htmlFor="recipeSelect">Select a saved recipe (optional)</Label>
+                <Select onValueChange={(value) => setSelectedRecipeId(Number(value))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a recipe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {userRecipes.map((recipe) => (
+                      <SelectItem key={recipe.id} value={recipe.id.toString()}>
+                        {recipe.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="recipeToEnhance">Recipe to Enhance (or enter a new recipe)</Label>
                 <Textarea
                   id="recipeToEnhance"
                   placeholder="Enter your recipe here..."
