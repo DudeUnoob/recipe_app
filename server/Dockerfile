@@ -1,17 +1,27 @@
-# Dockerfile for Node.js app
+# Base Node.js image
 FROM node:16-alpine
 
-# Create app directory
+# Set working directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
 
-RUN npm install
+# Install dependencies
+RUN npm ci --only=production
 
-# Bundle app source
-COPY . .
+# Create non-root user for security
+RUN addgroup -g 1001 nodejs && \
+    adduser -S -u 1001 -G nodejs nodejs
 
-# Expose port and start the application
+# Copy application code
+COPY --chown=nodejs:nodejs . .
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
 EXPOSE 3000
+
+# Start the application
 CMD [ "npm", "start" ]
