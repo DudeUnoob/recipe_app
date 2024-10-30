@@ -61,6 +61,7 @@ export default function AIRecipeAssistant() {
   const [isLoading, setIsLoading] = useState(false)
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([])
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState('generate')
 
   useEffect(() => {
     if (!user) {
@@ -70,6 +71,16 @@ export default function AIRecipeAssistant() {
       fetchUserRecipes()
     }
   }, [user, navigate])
+
+  useEffect(() => {
+    // Reset states when switching tabs
+    setGeneratedRecipe('')
+    setEnhancedRecipe('')
+    setNutritionalInfo('')
+    setIngredients('')
+    setRecipeToEnhance('')
+    setSelectedRecipeId(null)
+  }, [activeTab])
 
   const fetchUserPreferences = async () => {
     try {
@@ -167,6 +178,7 @@ export default function AIRecipeAssistant() {
     try {
       const recipe = await generateRecipe(ingredients, userPreferences)
       setGeneratedRecipe(recipe)
+      setNutritionalInfo('')  // Reset nutritional info when generating a new recipe
     } catch (error) {
       console.error('Error generating recipe:', error)
       toast({
@@ -191,6 +203,7 @@ export default function AIRecipeAssistant() {
       }
       const enhanced = await enhanceRecipe(recipeToEnhanceContent, userPreferences)
       setEnhancedRecipe(enhanced)
+      setNutritionalInfo('')  // Reset nutritional info when enhancing a recipe
     } catch (error) {
       console.error('Error enhancing recipe:', error)
       toast({
@@ -206,7 +219,8 @@ export default function AIRecipeAssistant() {
   const handleNutritionalAnalysis = async () => {
     setIsLoading(true)
     try {
-      const analysis = await getNutritionalAnalysis(generatedRecipe || enhancedRecipe)
+      const recipeToAnalyze = activeTab === 'generate' ? generatedRecipe : enhancedRecipe
+      const analysis = await getNutritionalAnalysis(recipeToAnalyze)
       setNutritionalInfo(analysis)
     } catch (error) {
       console.error('Error getting nutritional analysis:', error)
@@ -224,7 +238,6 @@ export default function AIRecipeAssistant() {
     try {
       const imageResult: any = await imageApi(recommendation.title)
       const imageUrl = imageResult.results[0].urls.regular
-
       const { data, error } = await supabase
         .from('recipes')
         .insert({
@@ -260,7 +273,7 @@ export default function AIRecipeAssistant() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">AI Recipe Assistant</h1>
       
-      <Tabs defaultValue="generate" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="generate">Generate Recipe</TabsTrigger>
           <TabsTrigger value="enhance">Enhance Recipe</TabsTrigger>
@@ -368,7 +381,7 @@ export default function AIRecipeAssistant() {
                             <AccordionItem value="ingredients">
                               <AccordionTrigger>Ingredients</AccordionTrigger>
                               <AccordionContent>
-                                <ul className="list-disc pl-5">
+                                <ul className="list-disc  pl-5">
                                   {recipe.ingredients.map((ingredient, i) => (
                                     <li key={i} className="text-sm">{ingredient}</li>
                                   ))}
