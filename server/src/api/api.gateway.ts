@@ -17,7 +17,20 @@ broker.createService(GenerateRecipeService);
 broker.createService(GetNutritionalAnalysisService);
 broker.createService(GetPersonalizedRecommendations);
 
-app.use(cors())
+const allowedOrigins = process.env.NODE_ENV === 'production'
+? ["https://server-aged-sun-5744.fly.dev/"] : ["http://localhost:5173"]
+
+const corsOptions = {
+    origin: function(origin: any, callback: any) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(express.urlencoded())
 
