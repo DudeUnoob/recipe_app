@@ -1,4 +1,3 @@
-// src/api/api.gateway.ts
 import express, { application, Request, Response } from "express";
 import { ServiceBroker } from "moleculer"; 
 import AIService from "../services/ai.service";
@@ -17,22 +16,16 @@ broker.createService(GenerateRecipeService);
 broker.createService(GetNutritionalAnalysisService);
 broker.createService(GetPersonalizedRecommendations);
 
-const allowedOrigins = process.env.NODE_ENV === 'production'
-? ["https://server-aged-sun-5744.fly.dev/"] : ["http://localhost:5173"]
-
-const corsOptions = {
-    origin: function(origin: any, callback: any) {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    }
+const corsOption = {
+    origin: ['http://localhost:5173', 'https://recipe-app-nu-gules.vercel.app'],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
 }
 
-app.use(cors(corsOptions))
-app.use(express.json())
-app.use(express.urlencoded())
+// Middleware
+app.use(cors(corsOption));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Route to get user by ID
 app.get("/api/user/:id", async (req: Request, res: Response) => {
@@ -45,14 +38,13 @@ app.get("/api/user/:id", async (req: Request, res: Response) => {
   }
 });
 
-
 app.post('/api/generateRecipe', async(req: Request, res: Response) => {
     try{
         const data = await broker.call("generateRecipe.generateRecipe", 
             { ingredients: req.body.ingredients, userPreferences: req.body.userPreferences }
         )
         if(!data) return res.status(404).send("Error with your input")
-        
+
         res.json(data)
     }
 
