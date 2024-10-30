@@ -1,5 +1,4 @@
 node_modules
 process.env
 *.env
-.env.development
-.env.production
+*.env.*

@@ -1,6 +1,6 @@
 // src/api/api.gateway.ts
 import express, { application, Request, Response } from "express";
-import { ServiceBroker } from "moleculer";
+import { ServiceBroker } from "moleculer"; 
 import AIService from "../services/ai.service";
 import EnhanceRecipeService from "../services/enhanceRecipe.service"
 import GenerateRecipeService from "../services/generateRecipe.service";
