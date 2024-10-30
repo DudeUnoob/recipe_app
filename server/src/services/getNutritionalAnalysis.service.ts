@@ -1,7 +1,7 @@
 import { Service, ServiceBroker } from "moleculer";
 import { Context } from "moleculer";
 import { client } from "../functions/groq";
-
+import { aiModel } from "../scripts/AIModel";
 class GetNutritionalAnalysisService extends Service {
 
     constructor(broker: ServiceBroker) {
@@ -26,7 +26,7 @@ class GetNutritionalAnalysisService extends Service {
                                 content: `Give me an indepth nutritional analysis based off the recipes in this message:
                                 ${finalRecipe}`,
                             }],
-                            model: "llama3-8b-8192"
+                            model: aiModel
 
                         })
 

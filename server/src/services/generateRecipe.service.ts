@@ -1,7 +1,7 @@
 import { Service, ServiceBroker } from "moleculer";
 import { Context } from "moleculer";
 import { client } from "../functions/groq";
-
+import { aiModel } from "../scripts/AIModel";
 
 class GenerateRecipeService extends Service {
 
@@ -29,7 +29,7 @@ class GenerateRecipeService extends Service {
                                 User preferences/dietary restrictions: ${userPreferences}`,
                                 
                             }],
-                            model: "llama3-8b-8192"
+                            model: aiModel
 
                         })
                         //   const chatCompletion = await client.chat.completions.create({

@@ -237,6 +237,9 @@ export default function RecipesPage() {
                 <SelectItem value="Lunch">Lunch</SelectItem>
                 <SelectItem value="Dinner">Dinner</SelectItem>
                 <SelectItem value="Dessert">Dessert</SelectItem>
+                <SelectItem value="Breakfast Ideas">Breakfast Ideas</SelectItem>
+                <SelectItem value="Similar Recipes">Similar Recipes</SelectItem>
+                <SelectItem value="Dessert Suggestions">Dessert Suggestions</SelectItem>
               </SelectContent>
             </Select>
             
