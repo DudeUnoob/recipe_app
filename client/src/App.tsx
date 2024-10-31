@@ -10,11 +10,14 @@ import AboutPage from './pages/AboutPage';
 import RecipesPage from './pages/RecipesPage';
 import SettingsPage from './pages/SettingsPage';
 import AIRecipeAssistant from './pages/AIRecipeAssistant';
+import { Toaster } from './components/ui/toaster';
+
 
 const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
+        <Toaster />
         <Navbar />
         <div className="App">
           <Routes>
