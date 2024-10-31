@@ -25,10 +25,10 @@ const TeamMember: React.FC<TeamMemberProps> = ({ name, role, image }) => {
 
 const TeamSection: React.FC = () => {
   const teamMembers = [
-    { name: "Alice Johnson", role: "Founder & CEO", image: "/placeholder.svg?height=200&width=200" },
-    { name: "Bob Smith", role: "CTO", image: "/placeholder.svg?height=200&width=200" },
-    { name: "Carol Williams", role: "Head of Design", image: "/placeholder.svg?height=200&width=200" },
-    { name: "David Brown", role: "Lead Developer", image: "/placeholder.svg?height=200&width=200" }
+    { name: "Damodar Kamani", role: "Founder, CEO, & Lead Developer", image: "https://media.licdn.com/dms/image/v2/D5603AQGa5VmjyH63LQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1708139170265?e=1735776000&v=beta&t=VXaDKZ8_KBFd3xxWfN-dETc310BEuAGqMe8sx1__Xac" },
+    { name: "Ethan Thokala", role: "Developer", image: "https://ygxxhnjzkniikecmgzyo.supabase.co/storage/v1/object/public/files/32bcfca9-9101-44d2-ac30-3b0b71c834af/ethan_cropped.png" },
+    // { name: "Carol Williams", role: "Head of Design", image: "/placeholder.svg?height=200&width=200" },
+    // { name: "David Brown", role: "Lead Developer", image: "/placeholder.svg?height=200&width=200" }
   ];
 
   return (
