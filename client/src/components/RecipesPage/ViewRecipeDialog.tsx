@@ -1,64 +1,61 @@
-import React from "react"
-import { Button } from "../../components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../components/ui/dialog"
-import { ChefHat, Clock, Users } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog"
+import { Button } from "../ui/button"
+import { ScrollArea } from "../ui/scroll-area"
 
 interface Recipe {
-  id: number;
-  title: string;
-  category: string;
-  cooktime: string;
-  servings: number;
-  image: string;
-  ingredients: string;
-  instructions: string;
-  isFavorite: boolean;
-  dateadded: Date;
+  id: number
+  title: string
+  category: string
+  cooktime: string
+  servings: number
+  ingredients: string
+  instructions: string
+  image: string
+  isFavorite: boolean
 }
 
 interface ViewRecipeDialogProps {
-  recipe: Recipe;
-  onClose: () => void;
+  recipe: Recipe | null
+  onClose: () => void
 }
 
-const ViewRecipeDialog: React.FC<ViewRecipeDialogProps> = ({ recipe, onClose }) => {
+export default function ViewRecipeDialog({ recipe, onClose }: ViewRecipeDialogProps) {
+  if (!recipe) return null
+
+  const ingredientsList = recipe.ingredients.split('\n').map(ingredient => ingredient.trim())
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[625px]">
+    <Dialog open={!!recipe} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{recipe.title}</DialogTitle>
+          <DialogDescription>
+            {recipe.category} | {recipe.cooktime} | Serves {recipe.servings}
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="mt-4">
           <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover rounded-md" />
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <span className="flex items-center">
-              <ChefHat className="mr-1 h-4 w-4" />
-              {recipe.category}
-            </span>
-            <span className="flex items-center">
-              <Clock className="mr-1 h-4 w-4" />
-              {recipe.cooktime}
-            </span>
-            <span className="flex items-center">
-              <Users className="mr-1 h-4 w-4" />
-              {recipe.servings} servings
-            </span>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Ingredients:</h3>
-            <p>{recipe.ingredients}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Instructions:</h3>
-            <p>{recipe.instructions}</p>
-          </div>
         </div>
-        <DialogFooter>
+        <ScrollArea className="mt-4 h-[300px] pr-4">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Ingredients:</h3>
+              <ol>
+                {ingredientsList.map((ingredient, index) => (
+                  <li key={index} className="text-sm mb-1">{ingredient}</li>
+                ))}
+              </ol>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Instructions:</h3>
+              <p className="text-sm whitespace-pre-wrap">{recipe.instructions}</p>
+            </div>
+          </div>
+        </ScrollArea>
+        <div className="mt-4 flex justify-end">
           <Button onClick={onClose}>Close</Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
 }
-
-export default ViewRecipeDialog

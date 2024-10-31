@@ -14,7 +14,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { toast } from '../hooks/use-toast'
 import { Loader2, Plus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-
 // Assume we have these AI service functions
 import { 
   generateRecipe, 
@@ -238,13 +237,17 @@ export default function AIRecipeAssistant() {
     try {
       const imageResult: any = await imageApi(recommendation.title)
       const imageUrl = imageResult.results[0].urls.regular
+      const formattedIngredients = recommendation.ingredients
+        .map((ingredient, index) => `${index + 1}. ${ingredient}`)
+        .join('\n')
+
       const { data, error } = await supabase
         .from('recipes')
         .insert({
           user_id: user?.id,
           title: recommendation.title,
           category: recommendation.category,
-          ingredients: recommendation.ingredients.join('\n'),
+          ingredients: formattedIngredients,
           instructions: recommendation.instructions,
           image: imageUrl
         })
@@ -379,13 +382,14 @@ export default function AIRecipeAssistant() {
                           <h3 className="text-lg font-semibold">{recipe.title}</h3>
                           <Accordion type="single" collapsible className="w-full mt-2">
                             <AccordionItem value="ingredients">
+                              
                               <AccordionTrigger>Ingredients</AccordionTrigger>
                               <AccordionContent>
-                                <ul className="list-disc  pl-5">
+                                <ol className="list-decimal pl-5">
                                   {recipe.ingredients.map((ingredient, i) => (
                                     <li key={i} className="text-sm">{ingredient}</li>
                                   ))}
-                                </ul>
+                                </ol>
                               </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="instructions">
