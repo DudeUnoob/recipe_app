@@ -61,15 +61,19 @@ export default function AIRecipeAssistant() {
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([])
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState('generate')
+  const [fetchedUserRecipes, setFetchedUserRecipes] = useState(false)
 
   useEffect(() => {
     if (!user) {
       navigate('/login')
     } else {
       fetchUserPreferences()
-      fetchUserRecipes()
+      if(!fetchedUserRecipes) {
+        fetchUserRecipes()
+        setFetchedUserRecipes(true)
+      }
     }
-  }, [user, navigate])
+  }, [user, navigate, fetchedUserRecipes])
 
   useEffect(() => {
     // Reset states when switching tabs
