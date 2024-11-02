@@ -277,7 +277,7 @@ export default function AIRecipeAssistant() {
   if (!user) return null
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-20">
       <h1 className="text-3xl font-bold mb-8">AI Recipe Assistant</h1>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

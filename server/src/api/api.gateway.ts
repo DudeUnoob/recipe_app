@@ -29,7 +29,7 @@ const standardLimiter = rateLimit({
 
 const aiServiceLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 2, /* Limit each IP to 1 requests per minute for AI services (def need to play around with the
+    max: 1, /* Limit each IP to 1 requests per minute for AI services (def need to play around with the
     rate limiting here)
     */
     message: "Too many AI requests from this IP, please try again after 1 minute",

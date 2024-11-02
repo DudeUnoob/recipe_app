@@ -93,11 +93,11 @@ export default function SettingsPage() {
   if (!user) return null
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-20">
       <Card className="max-w-2xl mx-auto">
         <div>
-          <h1>User Settings</h1>
-          <p>Manage your dietary preferences and restrictions</p>
+          <h1 className="text-3xl font-bold mb-2">User Settings</h1>
+          <p className="text-gray-600 mb-6">Manage your dietary preferences and restrictions</p>
         </div>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -111,28 +111,28 @@ export default function SettingsPage() {
                     onCheckedChange={(checked: any) => handlePreferenceChange('vegetarian', checked as boolean)}
                   />
                   <Label htmlFor="vegetarian">Vegetarian</Label>
-                  
+
                   <Checkbox
                     id="vegan"
                     checked={preferences.vegan}
                     onCheckedChange={(checked: any) => handlePreferenceChange('vegan', checked as boolean)}
                   />
                   <Label htmlFor="vegan">Vegan</Label>
-                  
+
                   <Checkbox
                     id="glutenFree"
                     checked={preferences.glutenFree}
                     onCheckedChange={(checked: any) => handlePreferenceChange('glutenFree', checked as boolean)}
                   />
                   <Label htmlFor="glutenFree">Gluten-Free</Label>
-                  
+
                   <Checkbox
                     id="dairyFree"
                     checked={preferences.dairyFree}
                     onCheckedChange={(checked: any) => handlePreferenceChange('dairyFree', checked as boolean)}
                   />
                   <Label htmlFor="dairyFree">Dairy-Free</Label>
-                  
+
                   <Checkbox
                     id="nutFree"
                     checked={preferences.nutFree}
@@ -141,7 +141,7 @@ export default function SettingsPage() {
                   <Label htmlFor="nutFree">Nut-Free</Label>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="otherRestrictions">Other Dietary Restrictions or Allergies</Label>
                 <Textarea
@@ -152,7 +152,7 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end mt-6">
               <Button type="submit">Save Preferences</Button>
             </div>
