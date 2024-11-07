@@ -17,9 +17,10 @@ interface RecipeCardProps {
   onToggleFavorite: () => void;
   onDelete: () => void;
   onEdit: () => void;
+  onShare: () => void;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite, onDelete, onEdit }: RecipeCardProps) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorite, onDelete, onEdit, onShare }: RecipeCardProps) => {
   return (
     <Card className="overflow-hidden">
       <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
@@ -54,7 +55,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView, onToggleFavorit
               <Button variant="ghost" size="sm" onClick={onDelete}>
                 <Trash2 className="h-4 w-4" />
               </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={onShare}>
               <Share2 className="h-4 w-4" />
             </Button>
           </div>

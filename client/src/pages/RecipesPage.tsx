@@ -3,7 +3,7 @@ import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, Copy, Check } from "lucide-react"
 import RecipeCard from "../components/RecipesPage/RecipeCard"
 import AddRecipeDialog from "../components/RecipesPage/AddRecipeDialog"
 import EditRecipeDialog from "../components/RecipesPage/EditRecipeDialog"
@@ -12,6 +12,8 @@ import imageApi from "../functions/imageApi"
 import { supabase } from "../lib/supabase"
 import { useAuth } from "../contexts/AuthContext"
 import { toast } from "../hooks/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
+import { Label } from "../components/ui/label"
 
 interface Recipe {
   id: number;
@@ -37,6 +39,9 @@ export default function RecipesPage() {
   const [activeTab, setActiveTab] = useState("all")
   const [isAddRecipeDialogOpen, setIsAddRecipeDialogOpen] = useState(false)
   const [isEditRecipeDialogOpen, setIsEditRecipeDialogOpen] = useState(false)
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [shareLink, setShareLink] = useState("")
+  const [isCopied, setIsCopied] = useState(false)
   const { user } = useAuth()
 
   useEffect(() => {
@@ -146,6 +151,7 @@ export default function RecipesPage() {
     }
   }
 
+
   const toggleFavorite = async (id: number) => {
     try {
       const recipeToUpdate = recipes.find(recipe => recipe.id === id)
@@ -196,6 +202,27 @@ export default function RecipesPage() {
       toast({
         title: "Error",
         description: "Failed to delete recipe. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleShare = (recipe: Recipe) => {
+    const link = `http://localhost:5173/recipe/${recipe.id}`
+    setShareLink(link)
+    setIsShareDialogOpen(true)
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+      toast({
+        title: "Error",
+        description: "Failed to copy link. Please try again.",
         variant: "destructive",
       })
     }
@@ -269,6 +296,7 @@ export default function RecipesPage() {
                     setEditingRecipe(recipe)
                     setIsEditRecipeDialogOpen(true)
                   }}
+                  onShare={() => handleShare(recipe)}
                 />
               ))}
             </div>
@@ -288,6 +316,7 @@ export default function RecipesPage() {
                       setEditingRecipe(recipe)
                       setIsEditRecipeDialogOpen(true)
                     }}
+                    onShare={() => handleShare(recipe)}
                   />
                 ))}
               </div>
@@ -309,6 +338,7 @@ export default function RecipesPage() {
                     setEditingRecipe(recipe)
                     setIsEditRecipeDialogOpen(true)
                   }}
+                  onShare={() => handleShare(recipe)}
                 />
               ))}
             </div>
@@ -337,6 +367,30 @@ export default function RecipesPage() {
       {selectedRecipe && (
         <ViewRecipeDialog recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
       )}
+
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share Recipe</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input
+                id="link"
+                defaultValue={shareLink}
+                readOnly
+              />
+            </div>
+            <Button size="sm" className="px-3" onClick={copyToClipboard}>
+              <span className="sr-only">Copy</span>
+              {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
