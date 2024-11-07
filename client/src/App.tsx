@@ -11,6 +11,7 @@ import RecipesPage from './pages/RecipesPage';
 import SettingsPage from './pages/SettingsPage';
 import AIRecipeAssistant from './pages/AIRecipeAssistant';
 import { Toaster } from './components/ui/toaster';
+import RecipeFinder from './pages/RecipeFinder';
 
 
 const App: React.FC = () => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
               <Route path='/recipes' element={<RecipesPage />} />
               <Route path="/settings" element={<SettingsPage />}/>
               <Route path="/aiservice" element={<AIRecipeAssistant />}/>
+              <Route path="/finder" element={<RecipeFinder />}/>
               {/* Add other protected routes here */}
             </Route>
           </Routes>

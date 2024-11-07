@@ -6,9 +6,9 @@ import { ChefHat, Menu, X } from "lucide-react"
 import { Button } from "./ui/button"
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  // DropdownMenuContent,
+  // DropdownMenuItem,
+  // DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -52,7 +52,7 @@ export default function Navbar() {
         Recipes
       </Link>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      {/* <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-0 font-normal text-base hover:bg-transparent">
             Categories
           </Button>
@@ -67,7 +67,10 @@ export default function Navbar() {
           <DropdownMenuItem>
             <Link to="/categories/dinner">Dinner</Link>
           </DropdownMenuItem>
-        </DropdownMenuContent>
+        </DropdownMenuContent> */}
+        <Link to="/finder" className="text-gray-700 hover:text-gray-900 py-2 lg:py-0 transition duration-150 ease-in-out">
+        Recipe Finder
+        </Link>
       </DropdownMenu>
       <Link to="/about" className="text-gray-700 hover:text-gray-900 py-2 lg:py-0 transition duration-150 ease-in-out">
         About

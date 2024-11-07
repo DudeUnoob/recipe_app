@@ -1,15 +1,54 @@
 import axios from "axios";
-//a1cc7e1daaf7459aa6f9b03a32bd926f
 
-async function searchRecipes({ ...data }) {
-    console.log(data)
-    axios.get("")
+const API_KEY = "a1cc7e1daaf7459aa6f9b03a32bd926f";
+const BASE_URL = "https://api.spoonacular.com/recipes";
+
+async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances = "", maxReadyTime = 0, offset = 0, number = 1 }) {
+    try {
+        // Build query parameters object
+        const params = {
+            apiKey: API_KEY,
+            ...(query && { query }),
+            ...(cuisine && { cuisine }),
+            ...(diet && { diet }),
+            ...(intolerances && { intolerances }),
+            ...(maxReadyTime && { maxReadyTime: maxReadyTime.toString() }),
+            ...(offset && { offset: offset.toString() }),
+            ...(number && { number: number.toString() })
+        };
+
+        // Pass params in the axios config
+        const { data } = await axios.get(`${BASE_URL}/complexSearch`, { params });
+
+        return data;
+    } catch (error) {
+        console.error('Error fetching recipes:', error);
+        throw error;
+    }
 }
 
-async function getRecipeInformation({ }) {
 
+async function getRecipeInformation(input: any) {
 
+    if (!input.id) {
+        throw new Error("Recipe ID is required");
+    }
 
+    try {
+        const { data } = await axios.get(`${BASE_URL}/${input.id}/information`, {
+            params: {
+                apiKey: API_KEY
+            },
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        return data;
+    } catch (error: any) {
+        console.error("Error getting recipe information:", error.message);
+        throw error;
+    }
 }
 
 export { searchRecipes, getRecipeInformation }
