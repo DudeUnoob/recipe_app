@@ -1,5 +1,5 @@
 import React from "react"
-import { Card, CardContent } from "../../components/ui/card"
+import { Card, CardContent } from "../ui/card_main"
 import { Button } from "../../components/ui/button"
 import { ChefHat, Clock, Users, BookOpen, Heart, Share2, Trash2, Edit } from "lucide-react"
 

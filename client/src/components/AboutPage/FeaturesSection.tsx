@@ -1,6 +1,6 @@
 import React from 'react';
 import { Book, ChefHat, Users, Search } from "lucide-react";
-import { Card, CardContent } from '../ui/card';
+import { Card, CardContent } from '../ui/card_main';
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (
   <Card>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChefHat, Book, Users } from "lucide-react";
-import { Card, CardContent } from '../ui/card';
+import { Card, CardContent } from '../ui/card_main';
 
 interface MissionCardProps {
   icon: React.ReactNode;
