@@ -21,7 +21,3 @@ primary_region = 'dfw'
   cpu_kind = 'shared'
   cpus = 1
 
-[services.concurrency]
-  type = "requests"
-  hard_limit = 15
-  soft_limit = 12
