@@ -3,7 +3,7 @@ import axios from "axios";
 const API_KEY = "a1cc7e1daaf7459aa6f9b03a32bd926f";
 const BASE_URL = "https://api.spoonacular.com/recipes";
 
-async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances = "", maxReadyTime = 0, offset = 0, number = 1 }) {
+async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances = "", maxReadyTime = 0, offset = 0, number = 10 }) {
     try {
         // Build query parameters object
         const params = {
@@ -28,14 +28,14 @@ async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances
 }
 
 
-async function getRecipeInformation(input: any) {
-
-    if (!input.id) {
+async function getRecipeInformation(id: any) {
+    console.log(id)
+    if (!id) {
         throw new Error("Recipe ID is required");
     }
 
     try {
-        const { data } = await axios.get(`${BASE_URL}/${input.id}/information`, {
+        const { data } = await axios.get(`${BASE_URL}/${id}/information`, {
             params: {
                 apiKey: API_KEY
             },

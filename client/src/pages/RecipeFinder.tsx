@@ -1,23 +1,32 @@
 "use client"
 
-import { useState,  } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog'
 import { Checkbox } from '../components/ui/checkbox'
 import { Slider } from '../components/ui/slider'
 import { toast } from '../hooks/use-toast'
-import { Clock, Users, Plus } from 'lucide-react'
+import { Plus, ChefHat, Clock, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { ScrollArea } from '../components/ui/scroll-area'
 
 // Assume we have a spoonacularApi service
 import { searchRecipes, getRecipeInformation } from '../services/spoonacularApi'
+//import { DialogDescription } from '@radix-ui/react-dialog'
 
 interface Recipe {
+  id: number
+  title: string
+  image: string
+  imageType: string
+}
+
+interface DetailedRecipe {
   id: number
   title: string
   image: string
@@ -41,11 +50,12 @@ export default function RecipeFinder() {
   const [intolerances, setIntolerances] = useState<string[]>([])
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [selectedRecipe, setSelectedRecipe] = useState<DetailedRecipe | null>(null)
 
   const cuisines = ['African', 'American', 'British', 'Cajun', 'Caribbean', 'Chinese', 'Eastern European', 'European', 'French', 'German', 'Greek', 'Indian', 'Irish', 'Italian', 'Japanese', 'Jewish', 'Korean', 'Latin American', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Nordic', 'Southern', 'Spanish', 'Thai', 'Vietnamese']
   const diets = ['Gluten Free', 'Ketogenic', 'Vegetarian', 'Lacto-Vegetarian', 'Ovo-Vegetarian', 'Vegan', 'Pescetarian', 'Paleo', 'Primal', 'Low FODMAP', 'Whole30']
   const intoleranceOptions = ['Dairy', 'Egg', 'Gluten', 'Grain', 'Peanut', 'Seafood', 'Sesame', 'Shellfish', 'Soy', 'Sulfite', 'Tree Nut', 'Wheat']
+
 
   const handleSearch = async () => {
     setIsLoading(true)
@@ -57,7 +67,7 @@ export default function RecipeFinder() {
         maxReadyTime,
         intolerances: intolerances.join(','),
       })
-      setRecipes(results)
+      setRecipes(results.results || [])
     } catch (error) {
       console.error('Error searching recipes:', error)
       toast({
@@ -71,8 +81,19 @@ export default function RecipeFinder() {
   }
 
   const handleViewRecipe = async (recipeId: number) => {
+    const cachedRecipe = localStorage.getItem(`recipe_${recipeId}`)
+    
+    if (cachedRecipe) {
+      // Parse and set the cached recipe data
+      setSelectedRecipe(JSON.parse(cachedRecipe))
+      return
+    }
+  
     try {
       const recipeInfo: any = await getRecipeInformation(recipeId)
+      
+      localStorage.setItem(`recipe_${recipeId}`, JSON.stringify(recipeInfo))
+      
       setSelectedRecipe(recipeInfo)
     } catch (error) {
       console.error('Error fetching recipe information:', error)
@@ -83,21 +104,26 @@ export default function RecipeFinder() {
       })
     }
   }
+  
 
   const handleSaveRecipe = async (recipe: Recipe) => {
     try {
-      const {  error } = await supabase
+      setIsLoading(true)
+      const detailedRecipe: any = await getRecipeInformation(recipe.id)
+
+      const { error } = await supabase
         .from('recipes')
         .insert({
           user_id: user?.id,
-          title: recipe.title,
-          image: recipe.image,
-          category: recipe.cuisines[0] || recipe.dishTypes[0] || 'Uncategorized',
-          cooktime: `${recipe.readyInMinutes} minutes`,
-          servings: recipe.servings,
-          ingredients: recipe.extendedIngredients.map(ing => ing.original).join('\n'),
-          instructions: recipe.instructions,
+          title: detailedRecipe.title,
+          image: detailedRecipe.image,
+          category: detailedRecipe.cuisines[0] || detailedRecipe.dishTypes[0] || 'Uncategorized',
+          cooktime: detailedRecipe.readyInMinutes,
+          servings: detailedRecipe.servings,
+          ingredients: detailedRecipe.extendedIngredients.map((ing: any) => ing.original).join('\n'),
+          instructions: detailedRecipe.instructions,
           isFavorite: false,
+          dateadded: new Date().toISOString()
         })
         .select()
 
@@ -114,13 +140,15 @@ export default function RecipeFinder() {
         description: 'Failed to save recipe. Please try again.',
         variant: 'destructive',
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Find Recipes</h1>
-      
+
       <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -213,63 +241,55 @@ export default function RecipeFinder() {
             <CardHeader>
               <CardTitle>{recipe.title}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-1" />
-                  <span className="text-sm">{recipe.readyInMinutes} min</span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  <span className="text-sm">{recipe.servings} servings</span>
-                </div>
-              </div>
-              <div className="text-sm text-gray-500 mb-2">
-                {recipe.cuisines.length > 0 && `Cuisine: ${recipe.cuisines.join(', ')}`}
-                {recipe.dishTypes.length > 0 && ` • Dish: ${recipe.dishTypes.join(', ')}`}
-              </div>
-              {recipe.diets.length > 0 && (
-                <div className="text-sm text-gray-500">
-                  Diets: {recipe.diets.join(', ')}
-                </div>
-              )}
-            </CardContent>
             <CardFooter className="flex justify-between">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" onClick={() => handleViewRecipe(recipe.id)}>View Recipe</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl">
+                <DialogContent className="sm:max-w-[425px]">
                   {selectedRecipe && (
                     <>
                       <DialogHeader>
                         <DialogTitle>{selectedRecipe.title}</DialogTitle>
-                        <DialogDescription>
-                          {selectedRecipe.readyInMinutes} minutes • {selectedRecipe.servings} servings
-                        </DialogDescription>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                          <span className="flex items-center">
+                            <ChefHat className="mr-1 h-4 w-4" />
+                            {selectedRecipe.cuisines}
+                          </span>
+                          <span className="flex items-center">
+                            <Clock className="mr-1 h-4 w-4" />
+                            {selectedRecipe.readyInMinutes}
+                          </span>
+                          <span className="flex items-center">
+                            <Users className="mr-1 h-4 w-4" />
+                            {selectedRecipe.servings} servings
+                          </span>
+                        </div>
                       </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <img src={selectedRecipe.image} alt={selectedRecipe.title} className="col-span-4 w-full h-64 object-cover rounded-lg" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold mb-2">Ingredients:</h3>
-                          <ul className="list-disc pl-5">
-                            {selectedRecipe.extendedIngredients.map((ingredient, index) => (
-                              <li key={index}>{ingredient.original}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold mb-2">Instructions:</h3>
-                          <p className="whitespace-pre-wrap">{selectedRecipe.instructions}</p>
-                        </div>
+                      <div className="mt-4">
+                        <img src={selectedRecipe.image} alt={selectedRecipe.title} className="w-full h-48 object-cover rounded-md" />
                       </div>
+                      <ScrollArea className="mt-4 h-[300px] pr-4">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-semibold mb-2">Ingredients:</h3>
+                            <ul className="list-disc pl-5">
+                              {selectedRecipe.extendedIngredients.map((ingredient, index) => (
+                                <li key={index} className="text-sm mb-1">{ingredient.original}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold mb-2">Instructions:</h3>
+                            <p className="text-sm whitespace-pre-wrap">{selectedRecipe.instructions}</p>
+                          </div>
+                        </div>
+                      </ScrollArea>
                     </>
                   )}
                 </DialogContent>
               </Dialog>
-              <Button onClick={() => handleSaveRecipe(recipe)}>
+              <Button onClick={() => handleSaveRecipe(recipe)} disabled={isLoading}>
                 <Plus className="w-4 h-4 mr-2" /> Save Recipe
               </Button>
             </CardFooter>

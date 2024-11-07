@@ -123,6 +123,7 @@ export default function RecipeFinder() {
           ingredients: recipe.extendedIngredients.map(ing => ing.original).join('\n'),
           instructions: recipe.instructions,
           isFavorite: false,
+          dateadded: new Date().toISOString()
         })
         .select()
 

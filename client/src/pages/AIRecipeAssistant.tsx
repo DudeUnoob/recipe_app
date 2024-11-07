@@ -253,7 +253,8 @@ export default function AIRecipeAssistant() {
           category: recommendation.category,
           ingredients: formattedIngredients,
           instructions: recommendation.instructions,
-          image: imageUrl
+          image: imageUrl,
+          dateadded: new Date().toISOString()
         })
         .select()
 
