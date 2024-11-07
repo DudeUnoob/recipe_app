@@ -22,6 +22,7 @@ interface RecipeTabsProps {
   onToggleFavorite: (id: number) => void;
   onDelete: (id: number) => void;
   onEdit: (recipe: Recipe) => void;
+  onShare: (id: number) => void;
 }
 
 const RecipeTabs: React.FC<RecipeTabsProps> = ({ 
@@ -29,7 +30,8 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({
   onView, 
   onToggleFavorite, 
   onDelete, 
-  onEdit 
+  onEdit,
+  onShare
 }) => {
   return (
     <Tabs defaultValue="all" className="w-full">
@@ -49,6 +51,7 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({
               onToggleFavorite={() => onToggleFavorite(recipe.id)}
               onDelete={() => onDelete(recipe.id)}
               onEdit={() => onEdit(recipe)}
+              onShare={() => onShare(recipe.id)}
             />
           ))}
         </div>
@@ -66,6 +69,7 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({
                 onToggleFavorite={() => onToggleFavorite(recipe.id)}
                 onDelete={() => onDelete(recipe.id)}
                 onEdit={() => onEdit(recipe)}
+                onShare={() => onShare(recipe.id)}
               />
             ))}
         </div>
@@ -84,6 +88,7 @@ const RecipeTabs: React.FC<RecipeTabsProps> = ({
                 onToggleFavorite={() => onToggleFavorite(recipe.id)}
                 onDelete={() => onDelete(recipe.id)}
                 onEdit={() => onEdit(recipe)}
+                onShare={() => onShare(recipe.id)}
               />
             ))}
         </div>
