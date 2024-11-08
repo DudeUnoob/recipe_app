@@ -1,27 +1,45 @@
-# Base Node.js image
-FROM node:16-alpine
+# syntax = docker/dockerfile:1
 
-# Set working directory
-WORKDIR /usr/src/app
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=22.1.0
+FROM node:${NODE_VERSION}-slim as base
 
-# Copy package files first to leverage Docker cache
-COPY package*.json ./
+LABEL fly_launch_runtime="Node.js"
 
-# Install dependencies
-RUN npm ci --only=production
+# Node.js app lives here
+WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1001 nodejs && \
-    adduser -S -u 1001 -G nodejs nodejs
+# Set production environment
+ENV NODE_ENV="production"
+
+
+# Throw-away build stage to reduce size of final image
+FROM base as build
+
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+
+# Install node modules
+COPY package-lock.json package.json ./
+RUN npm ci --include=dev
 
 # Copy application code
-COPY --chown=nodejs:nodejs . .
+COPY . .
 
-# Switch to non-root user
-USER nodejs
+# Build application
+RUN npm run build
 
-# Expose port
+# Remove development dependencies
+RUN npm prune --omit=dev
+
+
+# Final stage for app image
+FROM base
+
+# Copy built application
+COPY --from=build /app /app
+
+# Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-
-# Start the application
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "start" ]

@@ -1,36 +1,25 @@
+// index.ts
 import express from 'express';
-import { generateRecipe } from './api/recipe';
-// import Groq from 'groq-sdk';
-//import { getRecipeData } from "./db";
 import dotenv from 'dotenv';
 import { broker, app } from "./api/api.gateway";
-import { supabase } from './scripts/supabase';
-import { client } from './functions/groq';
 
+// Load environment variables
+dotenv.config();
 
-// const envPath = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-// dotenv.config({ path: envPath });
-
-
-
-// src/index.ts
-
-
-const PORT = 3000;
-const port: any = process.env.PORT || 3000
-
+const port: any = process.env.PORT || 3000;
 
 // Start Moleculer broker
 broker.start()
   .then(() => {
     // Start Express server
-
-    app.listen(port, '::', () => {
-      console.log(`API Gateway listening on http://localhost:${PORT}`);
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`API Gateway listening on port ${port}`);
     });
   })
-  .catch((err) => console.error("Failed to start services:", err));
-
+  .catch((err) => {
+    console.error("Failed to start services:", err);
+    process.exit(1); // Exit if broker fails to start
+  });
 
   // const client = new Groq({
   //   apiKey: process.env.AI_KEY

@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.6",
     "@types/csv-parse": "^1.1.12",
@@ -12,7 +13,6 @@
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.1",
     "groq-sdk": "^0.7.0",
-    "molecular": "^0.0.0",
     "moleculer": "^0.14.34",
     "pg": "^8.12.0"
   },
@@ -32,5 +32,7 @@
     "start": "NODE_ENV=production npx tsx src/index.ts",
     "dev": "NODE_ENV=development tsx watch src/index.ts"
   },
-  "type": "module"
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
