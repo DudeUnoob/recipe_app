@@ -6,13 +6,13 @@ import { broker, app } from "./api/api.gateway";
 // Load environment variables
 dotenv.config();
 
-const port: any = process.env.PORT || 3000;
+const port = parseInt(process.env.PORT || '3000', 10);
 
 // Start Moleculer broker
 broker.start()
   .then(() => {
     // Start Express server
-    app.listen(port, '0.0.0.0', () => {
+    app.listen(port, () => {
       console.log(`API Gateway listening on port ${port}`);
     });
   })
