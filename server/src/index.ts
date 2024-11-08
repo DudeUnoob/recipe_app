@@ -24,7 +24,7 @@ broker.start()
   .then(() => {
     // Start Express server
 
-    app.listen(PORT, () => {
+    app.listen(process.env.PORT || PORT, () => {
       console.log(`API Gateway listening on http://localhost:${PORT}`);
     });
   })

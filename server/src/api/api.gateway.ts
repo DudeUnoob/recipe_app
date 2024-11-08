@@ -29,7 +29,7 @@ const standardLimiter = rateLimit({
 
 const aiServiceLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 1, /* Limit each IP to 1 requests per minute for AI services (def need to play around with the
+    max: 5, /* Limit each IP to 1 requests per minute for AI services (def need to play around with the
     rate limiting here)
     */
     message: "Too many AI requests from this IP, please try again after 1 minute",
@@ -101,6 +101,7 @@ app.post("/api/enhanceRecipe", aiServiceLimiter, async(req: Request, res: Respon
 
 app.post("/api/getPersonalizedRecommendations", aiServiceLimiter, async(req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log("Hitting getPersonalized")
         const data = await broker.call("getPersonalizedRecommendations.getPersonalizedRecommendations", {
             user_id: req.body.user_id,
             userPreferences: req.body.userPreferences,

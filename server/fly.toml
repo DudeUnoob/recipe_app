@@ -21,3 +21,6 @@ primary_region = 'dfw'
   cpu_kind = 'shared'
   cpus = 1
 
+[[services]]
+  internal_port = 3000
+  processes = ["app"]
