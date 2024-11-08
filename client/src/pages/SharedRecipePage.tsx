@@ -65,9 +65,9 @@ export default function SharedRecipePage() {
       </div>
     )
   }
-
+//className="container mx-auto px-4 py-8 mt-20"
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl mt-20">
       <Card className="overflow-hidden">
         <div className="relative h-64 md:h-96">
           <img
