@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import AIRecipeAssistant from './pages/AIRecipeAssistant';
 import { Toaster } from './components/ui/toaster';
 import RecipeFinder from './pages/RecipeFinder';
+import SharedRecipePage from './pages/SharedRecipePage';
 
 
 const App: React.FC = () => {
@@ -26,6 +27,7 @@ const App: React.FC = () => {
             <Route path='/login' element={<AuthPages />}/>
             <Route path='/signup' element={<AuthPages />}/>
             <Route path='/about' element={<AboutPage />}/>
+            <Route path="/recipe/:id" element={<SharedRecipePage />}/>
             <Route element={<ProtectedRoute />}>
               <Route path='/dashboard' element={<Dashboard />}/>
               <Route path='/recipes' element={<RecipesPage />} />
