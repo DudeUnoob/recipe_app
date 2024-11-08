@@ -208,7 +208,7 @@ export default function RecipesPage() {
   }
 
   const handleShare = (recipe: Recipe) => {
-    const link = `http://localhost:5173/recipe/${recipe.id}`
+    const link = `${import.meta.env.VITE_MAIN_URL}/recipe/${recipe.id}`
     setShareLink(link)
     setIsShareDialogOpen(true)
   }
