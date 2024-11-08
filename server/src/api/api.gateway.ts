@@ -53,13 +53,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(standardLimiter);
 
 // Error handling middleware
-const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: "Internal Server Error",
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-    });
-};
+// const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+//     console.error(err.stack);
+//     res.status(500).json({
+//         error: "Internal Server Error",
+//         message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+//     });
+// };
 
 // Route handlers
 app.get("/api/user/:id", async (req: Request, res: Response, next: NextFunction) => {
@@ -126,6 +126,6 @@ app.post("/api/getNutritionalAnalysis", aiServiceLimiter, async(req: Request, re
 });
 
 // Apply error handling middleware last
-app.use(errorHandler);
+// app.use(errorHandler);
 
 export { app, broker };
