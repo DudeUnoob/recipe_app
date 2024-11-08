@@ -1,6 +1,6 @@
 // src/scripts/migrate-data.ts
 import { Pool } from 'pg';
-import { parse } from 'csv-parse';
+import { Parser } from 'csv-parse';
 import fs from 'fs';
 import { config } from 'dotenv';
 
@@ -11,12 +11,12 @@ const pool = new Pool({
 });
 
 async function migrateData() {
-  const parser = fs.createReadStream('../server/data/RAW_recipes.csv').pipe(parse({
+  const Parserr = fs.createReadStream('../server/data/RAW_recipes.csv').pipe(new Parser({
     columns: true,
     skip_empty_lines: true
   }));
 
-  for await (const record of parser) {
+  for await (const record of Parserr) {
     const query = `
       INSERT INTO recipes (name, id, minutes, contributor_id, submitted, tags, nutrition, n_steps, steps, description, ingredients, n_ingredients)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)

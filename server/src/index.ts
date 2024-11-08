@@ -17,6 +17,7 @@ dotenv.config({ path: envPath });
 
 
 const PORT = 3000;
+const port: any = process.env.PORT || 3000
 
 
 // Start Moleculer broker
@@ -24,7 +25,7 @@ broker.start()
   .then(() => {
     // Start Express server
 
-    app.listen(process.env.PORT || PORT, () => {
+    app.listen(port, '::', () => {
       console.log(`API Gateway listening on http://localhost:${PORT}`);
     });
   })
