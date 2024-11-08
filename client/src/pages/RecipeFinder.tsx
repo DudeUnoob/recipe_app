@@ -11,13 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from '../components/ui/checkbox'
 import { Slider } from '../components/ui/slider'
 import { toast } from '../hooks/use-toast'
-import { Plus, ChefHat, Clock, Users } from 'lucide-react'
+import { Plus, ChefHat, Clock, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { ScrollArea } from '../components/ui/scroll-area'
 
 // Assume we have a spoonacularApi service
 import { searchRecipes, getRecipeInformation } from '../services/spoonacularApi'
-//import { DialogDescription } from '@radix-ui/react-dialog'
 
 interface Recipe {
   id: number
@@ -51,13 +50,16 @@ export default function RecipeFinder() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedRecipe, setSelectedRecipe] = useState<DetailedRecipe | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalResults, setTotalResults] = useState(0)
+  const [pageInput, setPageInput] = useState('')
+  const resultsPerPage = 12
 
   const cuisines = ['African', 'American', 'British', 'Cajun', 'Caribbean', 'Chinese', 'Eastern European', 'European', 'French', 'German', 'Greek', 'Indian', 'Irish', 'Italian', 'Japanese', 'Jewish', 'Korean', 'Latin American', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Nordic', 'Southern', 'Spanish', 'Thai', 'Vietnamese']
   const diets = ['Gluten Free', 'Ketogenic', 'Vegetarian', 'Lacto-Vegetarian', 'Ovo-Vegetarian', 'Vegan', 'Pescetarian', 'Paleo', 'Primal', 'Low FODMAP', 'Whole30']
   const intoleranceOptions = ['Dairy', 'Egg', 'Gluten', 'Grain', 'Peanut', 'Seafood', 'Sesame', 'Shellfish', 'Soy', 'Sulfite', 'Tree Nut', 'Wheat']
 
-
-  const handleSearch = async () => {
+  const handleSearch = async (page = 1) => {
     setIsLoading(true)
     try {
       const results: any = await searchRecipes({
@@ -66,8 +68,12 @@ export default function RecipeFinder() {
         diet,
         maxReadyTime,
         intolerances: intolerances.join(','),
+        offset: (page - 1) * resultsPerPage,
+        number: resultsPerPage,
       })
       setRecipes(results.results || [])
+      setTotalResults(results.totalResults || 0)
+      setCurrentPage(page)
     } catch (error) {
       console.error('Error searching recipes:', error)
       toast({
@@ -84,7 +90,6 @@ export default function RecipeFinder() {
     const cachedRecipe = localStorage.getItem(`recipe_${recipeId}`)
     
     if (cachedRecipe) {
-      // Parse and set the cached recipe data
       setSelectedRecipe(JSON.parse(cachedRecipe))
       return
     }
@@ -104,7 +109,6 @@ export default function RecipeFinder() {
       })
     }
   }
-  
 
   const handleSaveRecipe = async (recipe: Recipe) => {
     try {
@@ -142,6 +146,31 @@ export default function RecipeFinder() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= Math.ceil(totalResults / resultsPerPage)) {
+      handleSearch(newPage)
+    }
+  }
+
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPageInput(e.target.value)
+  }
+
+  const handlePageInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const pageNumber = parseInt(pageInput)
+    if (pageNumber >= 1 && pageNumber <= Math.ceil(totalResults / resultsPerPage)) {
+      handleSearch(pageNumber)
+      setPageInput('')
+    } else {
+      toast({
+        title: 'Invalid Page',
+        description: 'Please enter a valid page number.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -228,7 +257,7 @@ export default function RecipeFinder() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSearch} disabled={isLoading}>
+          <Button onClick={() => handleSearch(1)} disabled={isLoading}>
             {isLoading ? 'Searching...' : 'Search Recipes'}
           </Button>
         </CardFooter>
@@ -254,11 +283,11 @@ export default function RecipeFinder() {
                         <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                           <span className="flex items-center">
                             <ChefHat className="mr-1 h-4 w-4" />
-                            {selectedRecipe.cuisines}
+                            {selectedRecipe.cuisines.join(', ')}
                           </span>
                           <span className="flex items-center">
                             <Clock className="mr-1 h-4 w-4" />
-                            {selectedRecipe.readyInMinutes}
+                            {selectedRecipe.readyInMinutes} min
                           </span>
                           <span className="flex items-center">
                             <Users className="mr-1 h-4 w-4" />
@@ -296,6 +325,46 @@ export default function RecipeFinder() {
           </Card>
         ))}
       </div>
+
+      {totalResults > 0 && (
+        <div className="mt-8 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {Math.ceil(totalResults / resultsPerPage)}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === Math.ceil(totalResults / resultsPerPage)}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <form onSubmit={handlePageInputSubmit} className="flex items-center space-x-2">
+            <Input
+              type="number"
+              placeholder="Go to page"
+              value={pageInput}
+              onChange={handlePageInputChange}
+              className="w-20"
+              min={1}
+              max={Math.ceil(totalResults / resultsPerPage)}
+            />
+            <Button type="submit" variant="outline">
+              Go
+            </Button>
+          </form>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 const API_KEY = "a1cc7e1daaf7459aa6f9b03a32bd926f";
 const BASE_URL = "https://api.spoonacular.com/recipes";
 
-async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances = "", maxReadyTime = 0, offset = 0, number = 10 }) {
+async function searchRecipes({ query = "", cuisine = "", diet = "", intolerances = "", maxReadyTime = 0, offset = 0, number = 12 }) {
     try {
         // Build query parameters object
         const params = {
