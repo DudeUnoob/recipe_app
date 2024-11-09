@@ -10,6 +10,7 @@ import cors from "cors";
 
 // Create an Express app and Moleculer broker
 const app = express();
+app.set('trust proxy', 1);
 const broker = new ServiceBroker({});
 
 // Initialize services
